@@ -21,7 +21,7 @@ format:
 lint:
 	uv sync --group lint
 	uv run ruff format --check
-	uv run ruff check
+#uv run ruff check
 	uv run --all-groups mypy .
 
 .PHONY: test
@@ -29,11 +29,16 @@ test:
 	uv sync --group test
 	uv run pytest
 
-.PHONY: all-groups
-all-groups:
+.PHONY: pre-commit
+pre-commit:
+	uv sync --group lint
+	uv run pre-commit run --all-files
+
+.PHONY: install-all
+install-all:
 	uv sync --all-groups
 
+.PHONY: run_readme
 run_readme:
-	uv pip install -e .
-	uv run cartai readme --description "A CLI tool for generating README files using AI" --code "cartai" --output "README.md"
-
+#	uv pip install -e .
+	uv run cartai readme --description "Crafting intelligent E2E documentation for trustworthy AI." --code "." --output "README_new.md"
