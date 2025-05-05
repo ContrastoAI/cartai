@@ -31,5 +31,4 @@ test = [
 ]
 nb = [
     "ipykernel>=6.29.5",
-    "python-dotenv>=1.0.1",
 ]

@@ -3,6 +3,7 @@
 CartAI CLI - A tool for crafting documentation from code.
 """
 
+from cartai.core.code_parser import ProjectParser
 from cartai.llm_agents.documenter import AIDocumenter
 import typer
 from rich.console import Console
@@ -14,34 +15,49 @@ console = Console()
 
 @app.command()
 def readme(
-    description: str = typer.Option(
-        ..., "--description", "-d", help="Project description"
+    description: str = typer.Option(..., help="Short description of the project"),
+    code: str = typer.Option(".", help="Path to the code directory"),
+    output: str = typer.Option("README.md", help="Output file path"),
+    dry_run: bool = typer.Option(
+        False, help="Print the README to stdout instead of writing to a file"
     ),
-    code_path: str = typer.Option(None, "--code", "-c", help="Path to code directory"),
-    output: str = typer.Option("README.md", "--output", "-o", help="Output file path"),
 ):
-    """Generate a README file based on description and code."""
+    """Generate a README.md file for the project."""
     console.print("[bold green]Crafting README[/]")
-    if code_path:
-        console.print(f"[bold blue]Using code from:[/] {code_path}")
-    console.print(f"[bold blue]Description:[/] {description}")
+    console.print(f"Using code from: {code}")
 
-    documenter = AIDocumenter()
-    result = documenter.generate(
-        template_name="readme.jinja",
-        context={"description": description, "structure": code_path},
+    parser = ProjectParser(
+        include_basic_entities=True,
     )
 
-    with open(output, "w") as f:
-        f.write(result)
+    summary = parser.get_summary(code)
+    console.print(f"Structure: {summary}")
 
-    console.print(f"[bold green]README created at[/] [bold yellow]{output}[/]")
+    full_structure = parser.parse(code)
+    console.print(f"Description: {description}")
+
+    documenter = AIDocumenter()
+
+    result = documenter.generate(
+        "readme.jinja",
+        {
+            "description": description,
+            "structure": f"Repo summary structure: {summary}. Repo files:{full_structure}"
+        },
+    )
+
+    if dry_run:
+        console.print(result)
+    else:
+        # Use UTF-8 encoding when writing the file
+        with open(output, "w", encoding="utf-8") as f:
+            f.write(result)
+
+        console.print(f"[bold green]README created at[/] [bold yellow]{output}[/]")
 
 
-# def main():
-#    """Main entry point for the CLI."""
-#    try:
-#        app()
-#    except Exception as e:
-#        console.print(f"[bold red]Error:[/] {str(e)}")
-#        raise typer.Exit(1)
+@app.callback()
+def callback():
+    """
+    CartAI - AI-powered documentation tools.
+    """

@@ -142,7 +142,6 @@ lint = [
 ]
 nb = [
     { name = "ipykernel" },
-    { name = "python-dotenv" },
 ]
 test = [
     { name = "pytest" },
@@ -163,10 +162,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 codespell = [{ name = "codespell", specifier = ">=2.2.0,<3.0.0" }]
 lint = [{ name = "ruff", specifier = ">=0.5.0,<1.0.0" }]
-nb = [
-    { name = "ipykernel", specifier = ">=6.29.5" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-]
+nb = [{ name = "ipykernel", specifier = ">=6.29.5" }]
 test = [{ name = "pytest", specifier = ">=8.3.4" }]
 typecheck = [{ name = "mypy", specifier = ">=1.10" }]
 

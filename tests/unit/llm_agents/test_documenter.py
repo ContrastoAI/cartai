@@ -1,13 +1,14 @@
 import pytest
 from pathlib import Path
 from cartai.llm_agents.documenter import AIDocumenter
+from cartai.llm_agents.utils import LowCostOpenAIModels
 
 
 @pytest.fixture
 def documenter():
     """Create a basic documenter instance for testing"""
     return AIDocumenter(
-        model="test-model",
+        model=LowCostOpenAIModels.GPT_4O_MINI,
         template_dir=Path("/tmp/templates"),  # Use a test directory
     )
 

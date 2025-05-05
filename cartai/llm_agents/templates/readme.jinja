@@ -3,7 +3,13 @@ You are an AI assistant. Write a professional README file.
 Project Description:
 {{ description }}
 
+{% if structure %}
 Codebase Structure:
 {{ structure }}
+{% endif %}
 
-Output a well-formatted README with sections: Overview, Installation, Usage.
+Output a well-formatted README with sections: Overview, Installation, Usage and Contributing.
+Include information about the project structure in your documentation if available.
+For the installation, take into account the pyproject.toml file, the prefered package version
+control system if available and Makefile. If there is a uv.lock file, the package manager is uv (uv run python, uv run pre-commit, uv sync ...),
+if there is a requirements.txt file, the package manager is pip (pip install -r requirements.txt)

@@ -4,7 +4,9 @@ AIDocumenter class for generating documentation using LLM models.
 
 import os
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Union
+from cartai.llm_agents.utils import LowCostOpenAIModels
+from cartai.core import ProjectParser
 from litellm import completion
 from jinja2 import Template
 from pydantic import BaseModel, Field, SecretStr
@@ -21,8 +23,9 @@ class AIDocumenter(BaseModel):
     and generate documentation based on provided templates and context.
     """
 
-    model: str | None = Field(
-        default="gpt-4o-mini", description="The LLM model to use for generation"
+    model: LowCostOpenAIModels | None = Field(
+        default=LowCostOpenAIModels.GPT_4O_MINI,
+        description="The LLM model to use for generation",
     )
     api_key: SecretStr | None = Field(
         default=None, description="The API key to use for the LLM provider"
@@ -60,6 +63,28 @@ class AIDocumenter(BaseModel):
         with open(template_path, "r") as f:
             return Template(f.read())
 
+    def _parse_code_structure(self, code_path: Optional[Union[str, Path]]) -> str:
+        """
+        Parse the code structure if a path is provided.
+
+        Args:
+            code_path: Path to the code directory
+
+        Returns:
+            A string representation of the code structure or empty string if no path
+        """
+        if not code_path:
+            return ""
+
+        parser = ProjectParser(include_content=False, summarize_large_files=True)
+
+        try:
+            return parser.get_summary(code_path)
+        except Exception as e:
+            # Log the error but continue with an empty structure
+            print(f"Error parsing code structure: {e}")
+            return ""
+
     def generate(
         self,
         template_name: str,
@@ -82,6 +107,10 @@ class AIDocumenter(BaseModel):
         Raises:
             ValueError: If no API key is provided either through initialization or environment variable
         """
+        # Process code structure if provided
+        # if "structure" in context and context["structure"]:
+        #    context["structure"] = self._parse_code_structure(context["structure"])
+
         # Load the template
         template_content = self._load_template(template_name)
 
@@ -109,17 +138,19 @@ class AIDocumenter(BaseModel):
             max_tokens=max_tokens,
         )
 
-        # Extract and return the generated content
         return response.choices[0].message.content
 
-    def save_documentation(self, content: str, output_path: Path) -> None:
-        """
-        Save generated documentation to a file.
+    # probably outside the class scope
+    # def save_documentation(self, content: str, output_path: Path) -> None:
+    #    """
+    #    Save generated documentation to a file.
 
-        Args:
-            content: The documentation content to save
-            output_path: Path where the documentation should be saved
-        """
-        output_path = Path(output_path)
-        output_path.write_text(content)
-        print(f"Documentation saved to {output_path}")
+
+#
+#    Args:
+#        content: The documentation content to save
+#        output_path: Path where the documentation should be saved
+#    """
+#    output_path = Path(output_path)
+#    output_path.write_text(content, encoding='utf-8')
+#    print(f"Documentation saved to {output_path}")
