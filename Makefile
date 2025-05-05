@@ -36,4 +36,3 @@ all-groups:
 run_readme:
 	uv pip install -e .
 	uv run cartai readme --description "A CLI tool for generating README files using AI" --code "cartai" --output "README.md"
-
