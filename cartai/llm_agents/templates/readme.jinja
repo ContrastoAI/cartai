@@ -1,15 +1,104 @@
-You are an AI assistant. Write a professional README file.
+# 🌟 {{ project_name }} 🌟
 
-Project Description:
+## 📝 Description
 {{ description }}
 
+{% if tech_stack %}
+## 🚀 Tech Stack
+
+{% for tech in tech_stack %}
+![{{ tech.name }}]({{ tech.icon_url }})
+{% endfor %}
+{% endif %}
+
 {% if structure %}
-Codebase Structure:
+## 📂 Codebase Structure
 {{ structure }}
 {% endif %}
 
-Output a well-formatted README with sections: Overview, Installation, Usage and Contributing.
-Include information about the project structure in your documentation if available.
-For the installation, take into account the pyproject.toml file, the prefered package version
-control system if available and Makefile. If there is a uv.lock file, the package manager is uv (uv run python, uv run pre-commit, uv sync ...),
-if there is a requirements.txt file, the package manager is pip (pip install -r requirements.txt)
+## ⚙️ Installation
+
+{% if package_manager == "uv" %}
+To install dependencies using **uv**:
+
+```bash
+uv sync
+{% elif package_manager == "pip" %}
+To install dependencies using pip:
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+{% endif %}
+
+{% if has_makefile %}
+If a Makefile is provided, you can also run:
+
+bash
+Copy
+Edit
+make install
+{% endif %}
+
+🔐 Environment Variables
+To run this project, you may need to set the following environment variables:
+
+bash
+Copy
+Edit
+{% for var in env_variables %}
+{{ var.name }}={{ var.example_value }}
+{% endfor %}
+Create a .env file in the project root and copy the variables above to configure your environment.
+
+💻 Usage
+{% if package_manager == "uv" %}
+Using uv:
+
+bash
+Copy
+Edit
+uv run <your_command>
+{% elif package_manager == "pip" %}
+Using pip:
+
+bash
+Copy
+Edit
+python <your_script.py>
+{% endif %}
+
+{% if usage_instructions %}
+{{ usage_instructions }}
+{% endif %}
+
+🚀 Deployment
+{% if deployment_instructions %}
+{{ deployment_instructions }}
+{% else %}
+To deploy the project, please refer to the documentation or deployment section.
+{% endif %}
+
+🖼️ Screenshots
+{% for screenshot in screenshots %}
+![{{ screenshot.caption }}]({{ screenshot.url }})
+{% endfor %}
+
+🤝 Contributing
+We welcome contributions!
+
+Fork the repository 🍴
+
+Create your feature branch git checkout -b feature/YourFeature
+
+Commit your changes git commit -m 'Add YourFeature'
+
+Push to the branch git push origin feature/YourFeature
+
+Open a pull request 📬
+
+Please follow the coding guidelines and check the Makefile or contributing docs if available.
+
+📄 License
+This project is licensed under the {{ license_name }} License. See the LICENSE file for details.
