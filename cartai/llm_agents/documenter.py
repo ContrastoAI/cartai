@@ -9,7 +9,7 @@ from cartai.llm_agents.utils import LowCostOpenAIModels
 from cartai.core import ProjectParser
 from litellm import completion
 from jinja2 import Template
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field, SecretStr, ConfigDict
 import dotenv
 
 dotenv.load_dotenv()
@@ -35,8 +35,7 @@ class AIDocumenter(BaseModel):
         description="Directory containing templates",
     )
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context: Any) -> None:
         """Ensure template directory exists after initialization"""
@@ -60,7 +59,7 @@ class AIDocumenter(BaseModel):
         if not template_path.exists():
             raise FileNotFoundError(f"Template not found: {template_path}")
 
-        with open(template_path, "r") as f:
+        with open(template_path, "r", encoding="utf-8") as f:
             return Template(f.read())
 
     def _parse_code_structure(self, code_path: Optional[Union[str, Path]]) -> str:

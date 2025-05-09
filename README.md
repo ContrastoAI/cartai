@@ -1,81 +1,114 @@
-# cartai
+```markdown
+# 🌟 CartAI 🌟
+
+## 📝 Description
 
 Crafting intelligent E2E documentation for trustworthy AI.
 
-## Overview
+## 📂 Codebase Structure
 
-The `cartai` project is dedicated to creating intelligent end-to-end documentation systems tailored for trustworthy AI applications. This involves leveraging various components to ensure that documentation is not only comprehensive but also easily maintainable and adaptable.
+```
+📁 /
+  📄 .env.example
+  📄 .pre-commit-config.yaml
+  📄 .python-version
+  📁 cartai/
+    📄 __init__.py
+    📁 adapters/
+    📁 cli/
+      📄 main.py
+    📁 core/
+      📄 __init__.py
+      📄 code_parser.py
+    📁 lineage/
+    📁 llm_agents/
+      📄 __init__.py
+      📄 documenter.py
+      📁 templates/
+        📄 readme.jinja
+      📄 utils.py
+  📄 LICENSE
+  📁 llm_agents/
+    📁 templates/
+  📄 Makefile
+  📄 pyproject.toml
+  📄 uv.lock
+```
 
-### Project Structure
+## ⚙️ Installation
 
-The codebase is organized into several key directories, each serving a specific purpose:
-
-| Folder         | Purpose                                      |
-| ---------------| -------------------------------------------- |
-| `adapters/`    | Thin, interchangeable tools                  |
-| `cli/`         | Lightweight user entry points                |
-| `core/`        | Pure logic, no external dependencies         |
-| `lineage/`     | High-level lineage coordination              |
-| `llm_agents/`  | LLM-based logic only                         |
-| `tests/`       | Developer trust & confidence                 |
-| `examples/`    | Fast time-to-first-success                   |
-
-## Installation
-
-To set up the `cartai` project, you need to have Python 3.12 or higher installed on your machine. The project uses [uv](https://docs.astral.sh/uv/getting-started/) as the package manager.
+To get started with the CartAI project, follow these instructions to set up your environment:
 
 1. Clone the repository:
    ```bash
-   git clone https://www.github.com/ContrastoAI/cartai.git
+   git clone https://www.github.com/ContrastoAI/cartai
    cd cartai
    ```
 
-2. Install the dependencies using the following command:
+2. Ensure you have [uv](https://docs.astral.sh/uv/getting-started/installation/) and [pre-commit](https://pre-commit.com/) installed. You can check their installation with:
    ```bash
-   uv install
+   make .uv
+   make .pre-commit
    ```
 
-3. Alternatively, you can install the package in editable mode for development:
+3. Install all dependencies and set up your environment:
    ```bash
-   uv pip install -e .
+   make install-all
    ```
 
-4. Ensure that `pre-commit` is installed for maintaining code quality:
-   ```bash
-   uv run pre-commit
-   ```
+## 💻 Usage
 
-## Usage
-
-The `cartai` package can be run from the command line. You can generate documentation using the following command:
-
+You can run the project using the provided Makefile commands. For example, to generate the README documentation, you can use:
 ```bash
-uv run cartai readme --description "Crafting intelligent E2E documentation for trustworthy AI." --code "." --output "README.md"
+make run_readme
 ```
 
-This will create a `README.md` file based on the specified input and template.
+This command will execute the documentation generation process with the description "Crafting intelligent E2E documentation for trustworthy AI." and output it to `README_new.md`.
 
-## Contributing
+### Other Makefile Commands
 
-Contributions are welcome! If you would like to help improve `cartai`, please follow these steps:
+- **Format code**: 
+  ```bash
+  make format
+  ```
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix:
+- **Lint code**: 
+  ```bash
+  make lint
+  ```
+
+- **Run tests**: 
+  ```bash
+  make test
+  ```
+
+- **Run pre-commit hooks**: 
+  ```bash
+  make pre-commit
+  ```
+
+## 🚀 Deployment
+
+To deploy the project, follow the standard deployment procedures for your environment. Ensure all dependencies are installed, and run the necessary commands as needed.
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can contribute:
+
+1. Fork the repository 🍴
+2. Create your feature branch: 
    ```bash
-   git checkout -b feature/my-feature
+   git checkout -b feature/YourFeature
    ```
-3. Make your changes and commit them:
+3. Commit your changes: 
    ```bash
-   git commit -m "Add my feature"
+   git commit -m 'Add YourFeature'
    ```
-4. Push your changes:
+4. Push to the branch: 
    ```bash
-   git push origin feature/my-feature
+   git push origin feature/YourFeature
    ```
-5. Submit a pull request.
+5. Open a pull request 📬
 
-Thank you for considering contributing to `cartai`! Your efforts help improve the project and assist others in the AI community.
-
-## License
-
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
+Please follow the coding guidelines and check the Makefile or contributing docs if available.
+```

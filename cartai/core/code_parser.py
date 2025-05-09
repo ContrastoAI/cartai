@@ -8,7 +8,7 @@ extracting structural information while optimizing for token efficiency.
 from pathlib import Path
 from typing import Any, Dict, Set, Union, Literal
 import re
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class ParsedBase(BaseModel):
     """Base class for parsed items with shared fields."""
@@ -100,6 +100,9 @@ class ProjectParser(BaseModel):
     #    default=True,
     #    description="Whether to include summaries for large files"
     # )
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
     def parse(self, path: Union[str, Path]) -> dict[str, Any]:
         """
@@ -270,6 +273,3 @@ class ProjectParser(BaseModel):
             result.append(file_info)
 
         return "\n".join(result)
-
-    class Config:
-        arbitrary_types_allowed = True  # Needed for Path objects

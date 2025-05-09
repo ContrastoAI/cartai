@@ -1,7 +1,19 @@
-# 🌟 {{ project_name }} 🌟
+You are a helpful assistant that generates a README.md file for a project.
+
+You will be given a description of the project, a list of technologies used, a codebase structure, and usage instructions.
+
+Follow the Makefile instructions to install dependencies and run the project. Suggest the usage of Makefile commands if possible.
+
+You will need to generate a README.md file that is easy to understand and use.
+
+Readme should be formatted using markdown. Proposed structure is as follows:
+
+# 🌟 {{ project_name | default("Project Name") }} 🌟
 
 ## 📝 Description
+{% if description %}
 {{ description }}
+{% endif %}
 
 {% if tech_stack %}
 ## 🚀 Tech Stack
@@ -11,61 +23,31 @@
 {% endfor %}
 {% endif %}
 
-{% if structure %}
 ## 📂 Codebase Structure
+{% if structure %}
 {{ structure }}
 {% endif %}
 
 ## ⚙️ Installation
 
-{% if package_manager == "uv" %}
-To install dependencies using **uv**:
-
-```bash
-uv sync
-{% elif package_manager == "pip" %}
-To install dependencies using pip:
-
-bash
-Copy
-Edit
-pip install -r requirements.txt
-{% endif %}
-
-{% if has_makefile %}
-If a Makefile is provided, you can also run:
-
-bash
-Copy
-Edit
-make install
-{% endif %}
-
+{% if env_variables %}
 🔐 Environment Variables
 To run this project, you may need to set the following environment variables:
 
-bash
-Copy
-Edit
 {% for var in env_variables %}
 {{ var.name }}={{ var.example_value }}
 {% endfor %}
 Create a .env file in the project root and copy the variables above to configure your environment.
+{% endif %}
 
 💻 Usage
 {% if package_manager == "uv" %}
 Using uv:
 
-bash
-Copy
-Edit
 uv run <your_command>
 {% elif package_manager == "pip" %}
 Using pip:
 
-bash
-Copy
-Edit
 python <your_script.py>
 {% endif %}
 
@@ -76,16 +58,19 @@ python <your_script.py>
 🚀 Deployment
 {% if deployment_instructions %}
 {{ deployment_instructions }}
-{% else %}
-To deploy the project, please refer to the documentation or deployment section.
 {% endif %}
 
+{% if screenshots %}
 🖼️ Screenshots
 {% for screenshot in screenshots %}
 ![{{ screenshot.caption }}]({{ screenshot.url }})
 {% endfor %}
+{% endif %}
 
+{% if contributing_instructions %}
 🤝 Contributing
+{{ contributing_instructions }}
+{% else %}
 We welcome contributions!
 
 Fork the repository 🍴
@@ -99,6 +84,8 @@ Push to the branch git push origin feature/YourFeature
 Open a pull request 📬
 
 Please follow the coding guidelines and check the Makefile or contributing docs if available.
-
+{% endif %}
+{% if license_name %}
 📄 License
 This project is licensed under the {{ license_name }} License. See the LICENSE file for details.
+{% endif %}
