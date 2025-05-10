@@ -1,0 +1,3 @@
+"""
+CartAI CLI commands package
+"""

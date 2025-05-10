@@ -1,5 +1,6 @@
-```markdown
 # 🌟 CartAI 🌟
+
+[![Build Status](https://github.com/ContrastoAI/cartai/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/ContrastoAI/cartai/actions)
 
 ## 📝 Description
 
