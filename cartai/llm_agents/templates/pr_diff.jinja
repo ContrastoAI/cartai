@@ -7,17 +7,24 @@ Pull Request Description:
 {{ description }}
 {% endif %}
 
+{% if files %}
 Files changed:
 {% for file in files %}
 - {{ file.path }} ({{ file.changes }} changes)
 {% endfor %}
+{% endif %}
 
 Diff content:
 {{ diff }}
 
+{% if project_code %}
+Project code:
+{{ project_code }}
+{% endif %}
+
 Please provide:
 1. A brief summary of the main changes (2-3 sentences)
 2. Key modifications by category (e.g., features, bug fixes, refactoring)
-3. Any potential concerns or areas that need attention
+3. If project code is provided, add any potential concerns or areas that need attention
 
 Focus on the most important changes and their impact. Be concise but thorough.
