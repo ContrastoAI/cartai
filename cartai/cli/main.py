@@ -42,7 +42,7 @@ def readme(
         "readme.jinja",
         {
             "description": description,
-            "structure": f"Repo summary structure: {summary}. Repo files:{full_structure}"
+            "structure": f"Repo summary structure: {summary}. Repo files:{full_structure}",
         },
     )
 

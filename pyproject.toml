@@ -23,8 +23,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [dependency-groups]
-lint = ["ruff<1.0.0,>=0.5.0"]
-typecheck = ["mypy>=1.10"]
+lint = ["ruff<1.0.0,>=0.5.0", "mypy>=1.10"]
 codespell = ["codespell<3.0.0,>=2.2.0"]
 test = [
     "pytest>=8.3.4",

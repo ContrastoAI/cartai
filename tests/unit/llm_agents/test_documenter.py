@@ -21,12 +21,14 @@ def test_load_template_not_found(documenter):
     with pytest.raises(FileNotFoundError):
         documenter._load_template("nonexistent.txt")
 
+
 def test_load_readme_template(documenter):
     """Test loading a template file"""
     template = documenter._load_template("readme.jinja")
     assert template is not None
     assert isinstance(template, Template)
     assert template.render() is not None
+
 
 def test_generate_readme_no_api_key(documenter):
     """Test generating a README with no API key"""

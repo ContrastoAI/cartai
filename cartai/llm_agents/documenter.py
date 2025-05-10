@@ -75,7 +75,7 @@ class AIDocumenter(BaseModel):
         if not code_path:
             return ""
 
-        parser = ProjectParser(include_content=False, summarize_large_files=True)
+        parser = ProjectParser()
 
         try:
             return parser.get_summary(code_path)

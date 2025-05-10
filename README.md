@@ -67,22 +67,22 @@ This command will execute the documentation generation process with the descript
 
 ### Other Makefile Commands
 
-- **Format code**: 
+- **Format code**:
   ```bash
   make format
   ```
 
-- **Lint code**: 
+- **Lint code**:
   ```bash
   make lint
   ```
 
-- **Run tests**: 
+- **Run tests**:
   ```bash
   make test
   ```
 
-- **Run pre-commit hooks**: 
+- **Run pre-commit hooks**:
   ```bash
   make pre-commit
   ```
@@ -96,15 +96,15 @@ To deploy the project, follow the standard deployment procedures for your enviro
 We welcome contributions! Here's how you can contribute:
 
 1. Fork the repository 🍴
-2. Create your feature branch: 
+2. Create your feature branch:
    ```bash
    git checkout -b feature/YourFeature
    ```
-3. Commit your changes: 
+3. Commit your changes:
    ```bash
    git commit -m 'Add YourFeature'
    ```
-4. Push to the branch: 
+4. Push to the branch:
    ```bash
    git push origin feature/YourFeature
    ```

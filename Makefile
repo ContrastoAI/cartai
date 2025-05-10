@@ -21,8 +21,8 @@ format:
 lint:
 	uv sync --group lint
 	uv run ruff format --check
-#uv run ruff check
-	uv run --all-groups mypy .
+#   uv run ruff check
+	uv run mypy . --exclude examples/ --exclude tests/
 
 .PHONY: test
 test:

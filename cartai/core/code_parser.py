@@ -6,24 +6,30 @@ extracting structural information while optimizing for token efficiency.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Set, Union, Literal
+from typing import Any, Set, Union, Literal
 import re
 from pydantic import BaseModel, Field, ConfigDict
 
+
 class ParsedBase(BaseModel):
     """Base class for parsed items with shared fields."""
+
     type: str
     name: str
     path: Path
     error: str | None = None
 
+
 class ParsedDirectory(ParsedBase):
     """A parsed directory with its contents."""
+
     type: Literal["directory"] = "directory"
     contents: list["ParsedItem"]
 
+
 class ParsedFile(ParsedBase):
     """A parsed file with its contents."""
+
     type: Literal["file"] = "file"
     extension: str
     size_kb: float
@@ -31,19 +37,18 @@ class ParsedFile(ParsedBase):
     content: str
     error: str | None = None
 
+
 ParsedItem = Union[ParsedDirectory, ParsedFile]
 
-# Update model_config to handle discriminated unions
-class ParsedDirectory(ParsedDirectory):
+
+class ParsedFileDiscriminator(ParsedDirectory):
     model_config = {
         "json_schema_extra": {
             "discriminator": "type",
-            "mapping": {
-                "directory": "ParsedDirectory",
-                "file": "ParsedFile"
-            }
+            "mapping": {"directory": "ParsedDirectory", "file": "ParsedFile"},
         }
     }
+
 
 class ProjectParser(BaseModel):
     """
@@ -103,7 +108,6 @@ class ProjectParser(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-
     def parse(self, path: Union[str, Path]) -> dict[str, Any]:
         """
         Parse a project directory and return its structure.
@@ -119,7 +123,7 @@ class ProjectParser(BaseModel):
             raise FileNotFoundError(f"Path does not exist: {path}")
 
         if path.is_file():
-            return self._parse_file(path)
+            return self._parse_file(path).model_dump()
 
         return self._parse_directory(path).model_dump()
 
@@ -196,7 +200,7 @@ class ProjectParser(BaseModel):
                 result.content = content
 
             if path.suffix in self.full_content_files:
-                result.content = content 
+                result.content = content
 
         except Exception as e:
             result.error = f"Could not read file: {str(e)}"
@@ -268,7 +272,7 @@ class ProjectParser(BaseModel):
                 result.append(self._format_summary(item, indent + 1))
         else:  # file
             file_info = f"{'  ' * indent}📄 {structure['name']}"
-            if structure['error']:
+            if structure["error"]:
                 file_info += f" ({structure['error']})"
             result.append(file_info)
 
