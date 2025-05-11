@@ -28,9 +28,7 @@ def readme(
 
 @app.command(name="pr-diff")
 def pr_diff(
-    pr_number: int | None = typer.Option(
-        None, help="Pull request number to analyze"
-    ),
+    pr_number: int | None = typer.Option(None, help="Pull request number to analyze"),
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
@@ -40,7 +38,9 @@ def pr_diff(
 ):
     """Analyze code changes in a pull request and generate a summary."""
     if dry_run:
-        console.print(f"[bold green]Analyzing PR diff:[/] Pull request number:{pr_number}, repo: {repo}")
+        console.print(
+            f"[bold green]Analyzing PR diff:[/] Pull request number:{pr_number}, repo: {repo}"
+        )
         return None
 
     pr_diff_command(pr_number=pr_number, repo=repo)

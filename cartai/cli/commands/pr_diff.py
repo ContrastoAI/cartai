@@ -9,6 +9,7 @@ import requests
 import fnmatch
 
 from rich.console import Console
+from cartai.llm_agents.documenter import AIDocumenter
 
 console = Console()
 
@@ -41,7 +42,7 @@ def _get_filtered_diff():
         raw_diff = subprocess.check_output(
             ["git", "diff", "--name-only", "main...HEAD"]
         ).decode("utf-8")
-    
+
     files = [
         f.strip()
         for f in raw_diff.splitlines()
@@ -49,7 +50,7 @@ def _get_filtered_diff():
     ]
     if not files:
         return ""
-    
+
     try:
         diff = subprocess.check_output(
             ["git", "diff", "origin/main...HEAD", "--", *files]
@@ -58,14 +59,12 @@ def _get_filtered_diff():
         diff = subprocess.check_output(
             ["git", "diff", "main...HEAD", "--", *files]
         ).decode("utf-8")
-    
+
     return diff[:MAX_DIFF_CHARS]  # Trim long diffs
 
 
 def pr_diff_command(
-    pr_number: int | None = typer.Option(
-        None, help="Pull request number to analyze"
-    ),
+    pr_number: int | None = typer.Option(None, help="Pull request number to analyze"),
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
@@ -77,9 +76,6 @@ def pr_diff_command(
     if not diff.strip():
         print("No relevant diff to summarize.")
         exit(0)
-
-    # === Call the LLM ===
-    from cartai.llm_agents.documenter import AIDocumenter
 
     documenter = AIDocumenter()
     summary = documenter.generate(
@@ -111,9 +107,7 @@ def pr_diff_command(
 
 
 def pr_diff_command_mock(
-    pr_number: int | None = typer.Option(
-        None, help="Pull request number to analyze"
-    ),
+    pr_number: int | None = typer.Option(None, help="Pull request number to analyze"),
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
