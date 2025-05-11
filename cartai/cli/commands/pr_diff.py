@@ -22,7 +22,7 @@ EXCLUDE_PATTERNS = [
     "*.jpg",
 ]
 MAX_DIFF_CHARS = int(os.getenv("MAX_DIFF_CHARS", 6000))  # Trim large diffs
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GH_TOKEN = os.getenv("GH_TOKEN")
 
 
 def _is_excluded(filepath):
@@ -77,7 +77,7 @@ def pr_diff_command(
     )
 
     headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
+        "Authorization": f"token {GH_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
     }
     pr_url = f"https://api.github.com/repos/{repo}/pulls/{pull_request}"

@@ -34,15 +34,15 @@ def pr_diff(
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
-    output: str | None = typer.Option("pr_diff_analysis.md", help="Output file path"),
     dry_run: bool | None = typer.Option(
         False, help="Print the analysis to stdout instead of writing to a file"
     ),
 ):
     """Analyze code changes in a pull request and generate a summary."""
-    pr_diff_command(
-        pull_request=pull_request, repo=repo, output=output, dry_run=dry_run
-    )
+    if dry_run:
+        return None
+
+    pr_diff_command(pull_request=pull_request, repo=repo)
 
 
 @app.callback()
