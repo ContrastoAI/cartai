@@ -30,10 +30,18 @@ def _is_excluded(filepath):
 
 
 def _get_filtered_diff():
-    # return subprocess.check_output(["git", "diff", "origin/main...HEAD"]).decode("utf-8")
-    raw_diff = subprocess.check_output(
-        ["git", "diff", "--name-only", "origin/main...HEAD"]
-    ).decode("utf-8")
+    try:
+        # Try local git diff first
+        raw_diff = subprocess.check_output(
+            ["git", "diff", "--name-only", "origin/main...HEAD"]
+        ).decode("utf-8")
+    except subprocess.CalledProcessError:
+        # Fallback for CI: fetch main branch first
+        subprocess.run(["git", "fetch", "origin", "main:main"], check=True)
+        raw_diff = subprocess.check_output(
+            ["git", "diff", "--name-only", "main...HEAD"]
+        ).decode("utf-8")
+    
     files = [
         f.strip()
         for f in raw_diff.splitlines()
@@ -41,9 +49,16 @@ def _get_filtered_diff():
     ]
     if not files:
         return ""
-    diff = subprocess.check_output(
-        ["git", "diff", "origin/main...HEAD", "--", *files]
-    ).decode("utf-8")
+    
+    try:
+        diff = subprocess.check_output(
+            ["git", "diff", "origin/main...HEAD", "--", *files]
+        ).decode("utf-8")
+    except subprocess.CalledProcessError:
+        diff = subprocess.check_output(
+            ["git", "diff", "main...HEAD", "--", *files]
+        ).decode("utf-8")
+    
     return diff[:MAX_DIFF_CHARS]  # Trim long diffs
 
 
