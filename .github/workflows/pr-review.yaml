@@ -1,0 +1,29 @@
+name: Summarize PR with LLM
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --python 3.12 --frozen --group lint
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Run LLM summary script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: uv run cartai pr-diff --pr-number "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}"
