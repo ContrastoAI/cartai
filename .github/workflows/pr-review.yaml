@@ -25,4 +25,4 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: uv run cartai pr_diff --pr-number "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}"
+        run: uv run cartai pr-diff --pr-number "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}"

@@ -102,8 +102,8 @@ def pr_diff_command_mock(
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
-    output: str | None = typer.Option("pr_diff_analysis.md", help="Output file path"),
-    dry_run: bool | None = typer.Option(
+    output: str = typer.Option("pr_diff_analysis.md", help="Output file path"),
+    dry_run: bool = typer.Option(
         False, help="Print the analysis to stdout instead of writing to a file"
     ),
 ):
