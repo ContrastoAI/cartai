@@ -28,12 +28,14 @@ def readme(
 
 @app.command(name="pr-diff")
 def pr_diff(
-    pull_request: int = typer.Option(..., help="Pull request number to analyze"),
-    repo: str = typer.Option(
+    pull_request: int | None = typer.Option(
+        None, help="Pull request number to analyze"
+    ),
+    repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
     ),
-    output: str = typer.Option("pr_diff_analysis.md", help="Output file path"),
-    dry_run: bool = typer.Option(
+    output: str | None = typer.Option("pr_diff_analysis.md", help="Output file path"),
+    dry_run: bool | None = typer.Option(
         False, help="Print the analysis to stdout instead of writing to a file"
     ),
 ):
