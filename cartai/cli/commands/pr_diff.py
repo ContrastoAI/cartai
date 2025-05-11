@@ -48,7 +48,7 @@ def _get_filtered_diff():
 
 
 def pr_diff_command(
-    pull_request: int | None = typer.Option(
+    pr_number: int | None = typer.Option(
         None, help="Pull request number to analyze"
     ),
     repo: str | None = typer.Option(
@@ -80,7 +80,7 @@ def pr_diff_command(
         "Authorization": f"token {GH_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
     }
-    pr_url = f"https://api.github.com/repos/{repo}/pulls/{pull_request}"
+    pr_url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}"
     pr_data = requests.get(pr_url, headers=headers).json()
     original_body: str = pr_data.get("body", "") or ""
 
@@ -96,7 +96,7 @@ def pr_diff_command(
 
 
 def pr_diff_command_mock(
-    pull_request: int | None = typer.Option(
+    pr_number: int | None = typer.Option(
         None, help="Pull request number to analyze"
     ),
     repo: str | None = typer.Option(
@@ -109,7 +109,7 @@ def pr_diff_command_mock(
 ):
     """Analyze code changes in a pull request and generate a summary."""
     console.print("[bold green]Analyzing PR diff[/]")
-    console.print(f"PR #{pull_request}" + (f" in repo {repo}" if repo else ""))
+    console.print(f"PR #{pr_number}" + (f" in repo {repo}" if repo else ""))
 
     # TODO: Implement PR diff analysis
     # 1. Fetch the PR diff from GitHub
@@ -117,7 +117,7 @@ def pr_diff_command_mock(
     # 3. Generate an analysis
 
     result = (
-        f"# PR #{pull_request} Analysis\n\nThis is a placeholder for PR diff analysis."
+        f"# PR #{pr_number} Analysis\n\nThis is a placeholder for PR diff analysis."
     )
 
     if dry_run:
