@@ -63,7 +63,7 @@ def _get_filtered_diff():
     return diff[:MAX_DIFF_CHARS]
 
 
-def pr_diff_command(
+async def pr_diff_command(
     pr_number: int | None = typer.Option(None, help="Pull request number to analyze"),
     repo: str | None = typer.Option(
         None, help="Repository name in format owner/repo (optional if in a git repo)"
@@ -78,9 +78,9 @@ def pr_diff_command(
         exit(0)
 
     documenter = AIDocumenter()
-    summary = documenter.generate(
-        "pr_diff.jinja",
-        {
+    summary = await documenter.generate(
+        template_name="pr_diff.jinja",
+        context={
             "pr_title": "Add new feature",
             "description": "Add a new feature to the project",
             "diff": diff,

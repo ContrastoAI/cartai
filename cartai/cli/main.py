@@ -4,6 +4,7 @@ CartAI CLI - A tool for crafting documentation from code.
 """
 
 import typer
+import asyncio
 from rich.console import Console
 from cartai.cli.commands.readme import readme_command
 from cartai.cli.commands.pr_diff import pr_diff_command
@@ -43,7 +44,7 @@ def pr_diff(
         )
         return None
 
-    pr_diff_command(pr_number=pr_number, repo=repo)
+    asyncio.run(pr_diff_command(pr_number=pr_number, repo=repo))
 
 
 @app.callback()

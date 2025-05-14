@@ -84,10 +84,11 @@ class AIDocumenter(BaseModel):
         """
         Generate documentation using a template and context.
         """
-        if not template_name and self.template_name:
-            template_name = self.template_name
-        else:
-            raise ValueError("No template name provided.")
+        if not template_name:
+            if self.template_name:
+                template_name = self.template_name
+            else:
+                raise ValueError("No template name provided.")
 
         if not context:
             context = self.context
