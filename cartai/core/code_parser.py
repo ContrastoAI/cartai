@@ -10,6 +10,8 @@ from typing import Any, Set, Union, Literal
 import re
 from pydantic import BaseModel, Field, ConfigDict
 
+from cartai.llm_agents.graph_states import CartaiDynamicState
+
 
 class ParsedBase(BaseModel):
     """Base class for parsed items with shared fields."""
@@ -56,8 +58,13 @@ class ProjectParser(BaseModel):
 
     This class recursively scans a project directory, analyzing files and folders
     while optimizing the output to minimize token usage when feeding to LLMs.
+    Can be used as a LangGraph node.
     """
 
+    project_path: Union[str, Path] = Field(
+        default=".",
+        description="Path to the project directory to parse",
+    )
     ignore_dirs: Set[str] = Field(
         default={
             ".git",
@@ -108,7 +115,7 @@ class ProjectParser(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def parse(self, path: Union[str, Path]) -> dict[str, Any]:
+    async def parse(self, path: Union[str, Path]) -> dict[str, Any]:
         """
         Parse a project directory and return its structure.
 
@@ -123,11 +130,11 @@ class ProjectParser(BaseModel):
             raise FileNotFoundError(f"Path does not exist: {path}")
 
         if path.is_file():
-            return self._parse_file(path).model_dump()
+            return (await self._parse_file(path)).model_dump()
 
-        return self._parse_directory(path).model_dump()
+        return (await self._parse_directory(path)).model_dump()
 
-    def _parse_directory(self, path: Path) -> ParsedDirectory:
+    async def _parse_directory(self, path: Path) -> ParsedDirectory:
         """Parse a directory and its contents recursively."""
         result = ParsedDirectory(
             name=path.name,
@@ -148,9 +155,9 @@ class ProjectParser(BaseModel):
                     continue
 
                 if item.is_dir():
-                    result.contents.append(self._parse_directory(item))
+                    result.contents.append(await self._parse_directory(item))
                 else:
-                    file_info = self._parse_file(item)
+                    file_info = await self._parse_file(item)
                     if file_info:
                         result.contents.append(file_info)
         except PermissionError:
@@ -158,7 +165,7 @@ class ProjectParser(BaseModel):
 
         return result
 
-    def _parse_file(self, path: Path) -> ParsedFile:
+    async def _parse_file(self, path: Path) -> ParsedFile:
         """Parse a single file and extract relevant information."""
         file_size_kb = path.stat().st_size / 1024
 
@@ -178,7 +185,8 @@ class ProjectParser(BaseModel):
         #    return result
 
         try:
-            content = path.read_text(errors="replace")
+            # Use aiofiles for async file reading
+            content = await self._read_file_async(path)
 
             # Extract basic entities if requested
             if self.include_basic_entities and path.suffix in {
@@ -206,6 +214,13 @@ class ProjectParser(BaseModel):
             result.error = f"Could not read file: {str(e)}"
 
         return result
+
+    async def _read_file_async(self, path: Path) -> str:
+        """Helper method to read file content asynchronously."""
+        import aiofiles
+
+        async with aiofiles.open(path, mode="r", errors="replace") as f:
+            return await f.read()
 
     def _extract_basic_entities(
         self, content: str, extension: str
@@ -247,7 +262,7 @@ class ProjectParser(BaseModel):
 
         return entities if (entities["classes"] or entities["functions"]) else {}
 
-    def get_summary(self, path: Union[str, Path]) -> str:
+    async def get_summary(self, path: Union[str, Path]) -> str:
         """
         Generate a token-efficient summary of the project structure.
 
@@ -258,7 +273,7 @@ class ProjectParser(BaseModel):
             A string representation of the project structure optimized for LLM consumption
         """
         path = Path(path)
-        structure = self.parse(path)
+        structure = await self.parse(path)
 
         return self._format_summary(structure)
 
@@ -277,3 +292,33 @@ class ProjectParser(BaseModel):
             result.append(file_info)
 
         return "\n".join(result)
+
+    async def run(self, state: dict[str, Any]) -> CartaiDynamicState:
+        """
+        Run the parser as a LangGraph node.
+
+        Args:
+            state: The current state containing project context
+
+        Returns:
+            Updated state with project structure information
+        """
+        if not self.project_path:
+            self.project_path = state.get("project_path", ".")
+
+        try:
+            structure = await self.parse(self.project_path)
+            return {
+                "messages": [1],
+                "outputs": [("ProjectStructure", structure)],
+                "project_context": {
+                    **(state.get("project_context", {})),
+                    "structure": structure,
+                },
+            }
+        except Exception as e:
+            return {
+                "messages": [0],
+                "outputs": [("ProjectStructure_Error", str(e))],
+                "project_context": state.get("project_context", {}),
+            }

@@ -4,13 +4,14 @@ AIDocumenter class for generating documentation using LLM models.
 
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
-from cartai.llm_agents.utils import LowCostOpenAIModels
-from cartai.core import ProjectParser
-from litellm import completion
+from typing import Any
+from cartai.llm_agents.graph_states import CartaiDynamicState
+from cartai.llm_agents.utils.model_client_utils import LowCostOpenAIModels
+from litellm import acompletion
 from jinja2 import Template
 from pydantic import BaseModel, Field, SecretStr, ConfigDict
 import dotenv
+import aiofiles
 
 dotenv.load_dotenv()
 
@@ -35,13 +36,23 @@ class AIDocumenter(BaseModel):
         description="Directory containing templates",
     )
 
+    template_name: str | None = Field(
+        default=None, description="The name of the template to use"
+    )
+    context: dict[str, Any] = Field(
+        default_factory=dict, description="The context to use for the template"
+    )
+    output: dict[str, Any] | None = Field(
+        default=None, description="The output to use for the template"
+    )
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context: Any) -> None:
         """Ensure template directory exists after initialization"""
         self.template_dir.mkdir(parents=True, exist_ok=True)
 
-    def _load_template(self, template_name: str) -> Template:
+    async def _load_template(self, template_name: str) -> Template:
         """
         Load a template from the template directory.
 
@@ -59,61 +70,31 @@ class AIDocumenter(BaseModel):
         if not template_path.exists():
             raise FileNotFoundError(f"Template not found: {template_path}")
 
-        with open(template_path, "r", encoding="utf-8") as f:
-            return Template(f.read())
+        async with aiofiles.open(template_path, "r", encoding="utf-8") as f:
+            content = await f.read()
+            return Template(content)
 
-    def _parse_code_structure(self, code_path: Optional[Union[str, Path]]) -> str:
-        """
-        Parse the code structure if a path is provided.
-
-        Args:
-            code_path: Path to the code directory
-
-        Returns:
-            A string representation of the code structure or empty string if no path
-        """
-        if not code_path:
-            return ""
-
-        parser = ProjectParser()
-
-        try:
-            return parser.get_summary(code_path)
-        except Exception as e:
-            # Log the error but continue with an empty structure
-            print(f"Error parsing code structure: {e}")
-            return ""
-
-    def generate(
+    async def generate(
         self,
-        template_name: str,
-        context: Dict[Any, Any],
+        template_name: str | None = None,
+        context: dict[str, Any] | None = None,
         temperature: float = 0.7,
         max_tokens: int = 2000,
     ) -> str:
         """
         Generate documentation using a template and context.
-
-        Args:
-            template_name: Name of the template file to use
-            context: Dictionary of variables to inject into the template
-            temperature: Controls randomness (0-1)
-            max_tokens: Maximum tokens in the response
-
-        Returns:
-            Generated documentation as a string
-
-        Raises:
-            ValueError: If no API key is provided either through initialization or environment variable
         """
-        # Process code structure if provided
-        # if "structure" in context and context["structure"]:
-        #    context["structure"] = self._parse_code_structure(context["structure"])
+        if not template_name:
+            if self.template_name:
+                template_name = self.template_name
+            else:
+                raise ValueError("No template name provided.")
 
-        # Load the template
-        template_content = self._load_template(template_name)
+        if not context:
+            context = self.context
 
-        # Format the template with the context
+        template_content = await self._load_template(template_name)
+
         prompt = template_content.render(context)
 
         # Check for API key availability
@@ -129,7 +110,7 @@ class AIDocumenter(BaseModel):
             )
 
         # Generate the documentation using litellm
-        response = completion(
+        response = await acompletion(
             model=self.model,
             api_key=api_key,
             messages=[{"role": "user", "content": prompt}],
@@ -137,19 +118,27 @@ class AIDocumenter(BaseModel):
             max_tokens=max_tokens,
         )
 
+        if self.output:
+            with open(self.output["output_name"], "w", encoding="utf-8") as f:
+                f.write(response.choices[0].message.content)
+
         return response.choices[0].message.content
 
-    # probably outside the class scope
-    # def save_documentation(self, content: str, output_path: Path) -> None:
-    #    """
-    #    Save generated documentation to a file.
+    # adapter to LangGraph
+    async def run(
+        self,
+        state: CartaiDynamicState,
+    ) -> CartaiDynamicState:
+        """
+        Run the documenter.
+        """
+        if self.template_name is None:
+            raise ValueError("template_name must be set")
 
+        response = await self.generate(context=state["project_context"])
 
-#
-#    Args:
-#        content: The documentation content to save
-#        output_path: Path where the documentation should be saved
-#    """
-#    output_path = Path(output_path)
-#    output_path.write_text(content, encoding='utf-8')
-#    print(f"Documentation saved to {output_path}")
+        return {
+            "messages": [1],
+            "outputs": [(f"Documenter_{self.template_name.split('.')[0]}", response)],
+            "project_context": state.get("project_context", {}),
+        }

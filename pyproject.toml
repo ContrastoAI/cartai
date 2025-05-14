@@ -10,6 +10,8 @@ dependencies = [
     "litellm>=1.68.0",
     "python-dotenv>=1.1.0",
     "pre-commit>=4.2.0",
+    "langgraph>=0.4.3",
+    "aiofiles>=24.1.0",
 ]
 
 [project.urls]
@@ -23,11 +25,21 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [dependency-groups]
-lint = ["ruff<1.0.0,>=0.5.0", "mypy>=1.10", "types-requests>=2.31.0"]
-codespell = ["codespell<3.0.0,>=2.2.0"]
+lint = [
+    "ruff<1.0.0,>=0.5.0",
+    "mypy>=1.10",
+    "types-requests>=2.31.0",
+    "types-PyYAML>=6.0.12",
+    "types-aiofiles>=24.1.0",
+]
+codespell = [
+    "codespell<3.0.0,>=2.2.0",
+]
 test = [
     "pytest>=8.3.4",
+    "pytest-asyncio>=0.23.5",
 ]
 nb = [
+    "grandalf>=0.8",
     "ipykernel>=6.29.5",
 ]
