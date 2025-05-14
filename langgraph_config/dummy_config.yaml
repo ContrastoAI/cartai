@@ -1,0 +1,20 @@
+agents:
+  - name: dummy
+    description: "A dummy agent that does nothing"
+    logic: !dummy {}
+  - name: dummy_with_parent
+    description: "A dummy agent that does nothing"
+    logic: !dummy {}
+    parent: dummy
+  - name: project_parser
+    logic: "cartai.core.code_parser.ProjectParser"
+    params:
+      project_path: "."
+  - name: readme_documenter
+    description: ""
+    logic: !documenter {}
+    params:
+      template_name: "readme.jinja"
+      output:
+          output_name: "./README_auto.md"
+    parent: project_parser
