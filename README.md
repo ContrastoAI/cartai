@@ -2,7 +2,7 @@
 <h1 align="center">🌟 Cartai 🌟</h1>
 <h3>Crafting intelligent E2E trazes & documentation for trustworthy AI</h2>
 
-  <kbd style="background-color: #ffffd7">**👩‍🔬 One-stop solution for your AI project lineage.**</kbd>
+  <kbd style="background-color: #ffffd7">**👩‍🔬 Agents for tracking your AI project lineage.**</kbd>
 <br>
 
 [![PyPI version](https://img.shields.io/pypi/v/cartai.svg)](https://pypi.org/project/cartai/)
