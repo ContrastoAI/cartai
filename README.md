@@ -1,9 +1,9 @@
 <div align="center">
-<h1 align="center">🌟 Cartai 🌟</h1>
-<h3>Crafting intelligent E2E trazes & documentation for trustworthy AI</h2>
+<h1 align="center">🌟 Cartai &mdash; The AI PM, for AI 🌟</h1>
+<h3>Crafting intelligent E2E supervision & documentation for trustworthy AI</h2>
 
-  <kbd style="background-color: #ffffd7">**👩‍🔬 Agents for tracking your AI project lineage.**</kbd>
-<br>
+<kbd><strong>👩‍💼 Agent-powered project intelligence, from PRD to production</strong></kbd>
+<br><br>
 
 [![PyPI version](https://img.shields.io/pypi/v/cartai.svg)](https://pypi.org/project/cartai/)
 [![Build Status](https://github.com/ContrastoAI/cartai/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/ContrastoAI/cartai/actions)
@@ -19,15 +19,6 @@
 ## 📂 Codebase Structure
 
 ```
-📁 /
-  📄 .env.example
-  📁 .github/
-    📁 workflows/
-      📄 pr-review.yaml
-      📄 pre-commit.yaml
-      📄 publish.yaml
-  📄 .pre-commit-config.yaml
-  📄 .python-version
   📁 cartai/
     📄 __init__.py
     📁 adapters/
@@ -56,13 +47,6 @@
   📁 langgraph_config/
     📄 dummy_config.yaml
     📄 repo_documenter.yaml
-  📄 LICENSE
-  📁 llm_agents/
-    📁 templates/
-  📄 Makefile
-  📄 pyproject.toml
-  📄 README.md
-  📄 uv.lock
 ```
 
 ## ⚙️ Installation
