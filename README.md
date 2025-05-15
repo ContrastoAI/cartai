@@ -1,22 +1,43 @@
-# 🌟 CartAI 🌟
+<div align="center">
+<h1 align="center">🌟 Cartai 🌟</h1>
+<h3>Crafting intelligent E2E trazes & documentation for trustworthy AI</h2>
 
+  <kbd style="background-color: #ffffd7">**👩‍🔬 One-stop solution for your AI project lineage.**</kbd>
+<br>
+
+[![PyPI version](https://img.shields.io/pypi/v/cartai.svg)](https://pypi.org/project/cartai/)
 [![Build Status](https://github.com/ContrastoAI/cartai/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/ContrastoAI/cartai/actions)
+[![GitHub Repo stars](https://img.shields.io/github/stars/contrastoAI/cartai?style=flat)](https://github.com/contrastoAI/cartai)
+<a href="https://github.com/huggingface/smolagents/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/huggingface/smolagents.svg?color=blue"></a>
+<a href="https://github.com/contrastoai/cartai/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/contrastoai/cartai.svg"></a>
 
-## 📝 Description
 
-Crafting intelligent E2E documentation for trustworthy AI.
+</div>
+
+<br>
+
+`cartai` is a library that enables end-to-end traceability and lineage of your AI projects. PRDs, data lineage, training experiments, deployments, monitoring, and third-party vibe-coding platforms.
 
 ## 📂 Codebase Structure
 
 ```
 📁 /
   📄 .env.example
+  📁 .github/
+    📁 workflows/
+      📄 pr-review.yaml
+      📄 pre-commit.yaml
+      📄 publish.yaml
   📄 .pre-commit-config.yaml
   📄 .python-version
   📁 cartai/
     📄 __init__.py
     📁 adapters/
     📁 cli/
+      📁 commands/
+        📄 __init__.py
+        📄 pr_diff.py
+        📄 readme.py
       📄 main.py
     📁 core/
       📄 __init__.py
@@ -25,14 +46,24 @@ Crafting intelligent E2E documentation for trustworthy AI.
     📁 llm_agents/
       📄 __init__.py
       📄 documenter.py
+      📄 graph.py
+      📄 graph_states.py
       📁 templates/
+        📄 pr_diff.jinja
         📄 readme.jinja
-      📄 utils.py
+      📁 utils/
+        📄 __init__.py
+        📄 model_client_utils.py
+        📄 yaml_utils.py
+  📁 langgraph_config/
+    📄 dummy_config.yaml
+    📄 repo_documenter.yaml
   📄 LICENSE
   📁 llm_agents/
     📁 templates/
   📄 Makefile
   📄 pyproject.toml
+  📄 README.md
   📄 uv.lock
 ```
 
@@ -63,7 +94,6 @@ You can run the project using the provided Makefile commands. For example, to ge
 ```bash
 make run_readme
 ```
-
 This command will execute the documentation generation process with the description "Crafting intelligent E2E documentation for trustworthy AI." and output it to `README_new.md`.
 
 ### Other Makefile Commands
