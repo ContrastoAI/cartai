@@ -9,8 +9,6 @@
 [![Build Status](https://github.com/ContrastoAI/cartai/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/ContrastoAI/cartai/actions)
 [![GitHub Repo stars](https://img.shields.io/github/stars/contrastoAI/cartai?style=flat)](https://github.com/contrastoAI/cartai)
 <a href="https://github.com/huggingface/smolagents/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/huggingface/smolagents.svg?color=blue"></a>
-<a href="https://github.com/contrastoai/cartai/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/contrastoai/cartai.svg"></a>
-
 
 </div>
 
