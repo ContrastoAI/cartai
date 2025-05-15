@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">🌟 Cartai &mdash; The AI PM, for AI 🌟</h1>
+<h1 align="center">🌟 Cartai 🌟<br> The AI PM, for AI</h1>
 <h3>Crafting intelligent E2E supervision & documentation for trustworthy AI</h2>
 
 <kbd><strong>👩‍💼 Agent-powered project intelligence, from PRD to production</strong></kbd>
