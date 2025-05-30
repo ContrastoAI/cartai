@@ -1,7 +1,20 @@
-# 🌟 Cartai 🌟
+<div align="center">
+<h1 align="center">🌟 Cartai &mdash; The AI PM, for AI 🌟</h1>
+<h3>Crafting intelligent E2E supervision & documentation for trustworthy AI</h2>
 
-## 📝 Description
-`cartai` is a library that enables end-to-end traceability and lineage of your AI projects. It assists in managing PRDs, data lineage, training experiments, deployments, monitoring, and third-party vibe-coding platforms.
+<kbd><strong>👩‍💼 Agent-powered project intelligence, from PRD to production</strong></kbd>
+<br><br>
+
+[![PyPI version](https://img.shields.io/pypi/v/cartai.svg)](https://pypi.org/project/cartai/)
+[![Build Status](https://github.com/ContrastoAI/cartai/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/ContrastoAI/cartai/actions)
+[![GitHub Repo stars](https://img.shields.io/github/stars/contrastoAI/cartai?style=flat)](https://github.com/contrastoAI/cartai)
+<a href="https://github.com/huggingface/smolagents/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/huggingface/smolagents.svg?color=blue"></a>
+
+</div>
+
+<br>
+
+`cartai` is a library that enables end-to-end traceability and lineage of your AI projects. PRDs, data lineage, training experiments, deployments, monitoring, and third-party vibe-coding platforms.
 
 ## 📂 Codebase Structure
 ```
