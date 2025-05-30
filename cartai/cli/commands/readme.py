@@ -24,5 +24,5 @@ def readme_command(
     ),
 ):
     """Generate a README.md file for the project."""
-    
+
     asyncio.run(async_langgraph_readme_command())

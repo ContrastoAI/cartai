@@ -14,3 +14,14 @@ agents:
       output:
         output_name: "README.md"
     parent: ProjectParser
+  - name: ProjectUMLDocumenter
+    description: "A UML diagram generator based on the project structure"
+    logic: !documenter {}
+    params:
+      template_name: "project_uml.jinja"
+      context:
+        description: "Prompt injection"
+        structure: "Prompt injection"
+      output:
+        output_name: "PROJECT_UML.md"
+    parent: ProjectParser
