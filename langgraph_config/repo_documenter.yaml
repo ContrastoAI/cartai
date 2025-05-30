@@ -1,6 +1,16 @@
 agents:
+  - name: ProjectParser
+    logic: "cartai.core.code_parser.ProjectParser"
+    params:
+      project_path: "../cartai"
   - name: ReadmeDocumenter
-    description: "A dummy agent that does nothing"
+    description: "A Readme generator based on the project description and structure"
     logic: !documenter {}
     params:
       template_name: "readme.jinja"
+      context:
+        description: "Prompt injection"
+        structure: "Prompt injection"
+      output:
+        output_name: "README.md"
+    parent: ProjectParser
