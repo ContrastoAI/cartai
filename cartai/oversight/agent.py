@@ -1,0 +1,123 @@
+import argparse
+import asyncio
+from typing import Dict, Any
+import logging
+import textwrap
+
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from dotenv import load_dotenv
+from cartai.oversight.settings import settings
+
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("mlflow-mcp-client")
+
+MLFLOW_SERVER_SCRIPT = settings.MLFLOW_SERVER_SCRIPT
+MODEL_NAME = settings.MODEL_NAME
+
+
+async def process_query(query: str) -> Dict[str, Any]:
+    """
+    Process a natural language query using LangChain agent with MCP tools.
+
+    Args:
+        query: The natural language query to process
+
+    Returns:
+        The agent's response
+    """
+    logger.info(f"Processing query: '{query}'")
+
+    # System prompt for better MLflow interactions
+    system_prompt = """
+    You are a helpful assistant specialized in managing and querying MLflow tracking servers.
+    You help users understand their machine learning experiments, models, and runs through
+    natural language queries.
+
+    When users ask questions about their MLflow tracking server, use the available tools to:
+    1. Find relevant information from experiments, models, runs, and artifacts
+    2. Compare metrics between different runs
+    3. Provide clear and concise answers with insights and explanations
+    4. Format numerical data appropriately (round to 4 decimal places when necessary)
+    5. Show relevant metrics and parameters when discussing models and runs
+
+    If a query is ambiguous, do your best to interpret it and provide a helpful response.
+    Always provide context and explanations with your responses, not just raw data.
+    """
+    try:
+        # Set up server parameters
+        client = MultiServerMCPClient(
+            {
+                "mlflow": {
+                    "url": MLFLOW_SERVER_SCRIPT,
+                    "transport": "streamable_http",
+                }
+            }
+        )
+        tools = await client.get_tools()
+        agent = create_react_agent(f"openai:{MODEL_NAME}", tools)
+
+        print(f"Processing query: '{query}'")
+        print("Connecting to MLflow MCP server...")
+
+        messages = [SystemMessage(content=system_prompt), HumanMessage(content=query)]
+
+        logger.info("Processing query through agent...")
+        print("Thinking...")
+
+        agent_response = await agent.ainvoke({"messages": messages})
+
+        logger.info("Query processing complete")
+        return agent_response
+
+    except Exception as e:
+        error_msg = f"Error: {str(e)}"
+        logger.error(error_msg, exc_info=True)
+        return {"error": error_msg}
+
+
+def main():
+    """Main function to parse arguments and run the query processing."""
+    parser = argparse.ArgumentParser(
+        description="Query MLflow using natural language",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""
+        Examples:
+          python mlflow_client.py "List all models in my MLflow registry"
+          python mlflow_client.py "List all experiments in MLflow registry"
+          python mlflow_client.py "Give me details about iris-model"
+          python mlflow_client.py "Give me system info"
+        """),
+    )
+
+    # Add arguments
+    parser.add_argument("query", type=str, help="The natural language query to process")
+
+    args = parser.parse_args()
+
+    try:
+        # Run the query processing with error handling
+        result = asyncio.run(process_query(args.query))
+
+        print("\n=== Results ===\n")
+        print(result)
+
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user")
+    except Exception as e:
+        print(f"\nError processing query: {str(e)}")
+        logger.error(f"Error in main execution: {str(e)}", exc_info=True)
+        import traceback
+
+        traceback.print_exc()
+
+
+if __name__ == "__main__":
+    main()

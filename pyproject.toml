@@ -12,6 +12,12 @@ dependencies = [
     "pre-commit>=4.2.0",
     "langgraph>=0.4.3",
     "aiofiles>=24.1.0",
+    "fastmcp>=2.7.1",
+    "mlflow>=2.22.1",
+    "langchain-mcp-adapters>=0.1.7",
+    "langchain-openai>=0.3.21",
+    "langchain>=0.3.25",
+    "pydantic-settings>=2.9.1",
 ]
 
 [project.urls]

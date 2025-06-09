@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  train:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./data:/mlflow/data
+
+volumes:
+  mlflow_data:
+    driver: local
+  mlflow_artifacts:
+    driver: local

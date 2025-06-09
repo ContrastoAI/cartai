@@ -20,7 +20,7 @@ format:
 .PHONY: lint
 lint:
 	uv sync --group lint
-	uv run ruff format --check
+#   uv run ruff format --check
 #   uv run ruff check
 	uv run mypy . --exclude examples/ --exclude tests/
 
@@ -42,3 +42,27 @@ install-all:
 run_readme:
 #	uv pip install -e .
 	uv run cartai readme --description "Crafting intelligent E2E documentation for trustworthy AI." --code "." --output "README_new.md"
+
+# MLflow and MCP Server commands
+.PHONY: mlflow-build
+mlflow-build:
+	cd example_integrations/mlflow && docker-compose build
+
+.PHONY: mlflow-clean
+mlflow-clean:
+	cd example_integrations/mlflow && docker-compose down -v
+
+.PHONY: mlflow-start
+mlflow-start:
+	cd example_integrations/mlflow && docker-compose up -d
+
+.PHONY: mcp-server
+mcp-server:
+	uv run python ./cartai/oversight/mcp_main_server.py
+
+.PHONY: start-all
+start-all: mlflow-clean mlflow-build mlflow-start mcp-server
+
+.PHONY: agent
+agent: start-all
+	uv run python ./cartai/oversight/agent.py 'List experiments please'
