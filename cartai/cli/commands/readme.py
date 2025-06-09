@@ -15,6 +15,7 @@ async def async_langgraph_readme_command():
     graph = CartaiGraph(config_file="langgraph_config/repo_documenter.yaml")
     await graph.ainvoke(CartaiDynamicState(messages=["0"]))
 
+
 def readme_command(
     description: str = typer.Option(..., help="Short description of the project"),
     code: str = typer.Option(".", help="Path to the code directory"),
