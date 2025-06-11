@@ -50,6 +50,11 @@ async def process_query(query: str) -> Dict[str, Any]:
 
     If a query is ambiguous, do your best to interpret it and provide a helpful response.
     Always provide context and explanations with your responses, not just raw data.
+
+    If using the notionApi tool, take into account this:
+    Problem	Fix
+    children sent in patch-page	Remove children, only send properties
+    Want to add text content	Use append-block-children API instead
     """
     try:
         # Set up server parameters
@@ -58,6 +63,20 @@ async def process_query(query: str) -> Dict[str, Any]:
                 "mlflow": {
                     "url": MLFLOW_SERVER_SCRIPT,
                     "transport": "streamable_http",
+                },
+                "notionApi": {
+                    "command": "docker",
+                    "args": [
+                      "run",
+                      "--rm",
+                      "-i",
+                      "-e", "OPENAPI_MCP_HEADERS",
+                      "mcp/notion"
+                    ],
+                    "env": {
+                      "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer ntn_xxx\",\"Notion-Version\":\"2022-06-28\"}"
+                    },
+                    "transport": "stdio",
                 }
             }
         )
@@ -107,7 +126,44 @@ def main():
         result = asyncio.run(process_query(args.query))
 
         print("\n=== Results ===\n")
-        print(result)
+        
+        # Beautify the output
+        if isinstance(result, dict) and "error" in result:
+            print(f"❌ Error: {result['error']}")
+        elif hasattr(result, 'get') and result.get('messages'):
+            # Extract the final AI response
+            messages = result['messages']
+            final_message = None
+            
+            # Find the last AI message with actual content
+            for msg in reversed(messages):
+                if hasattr(msg, 'content') and msg.content and not hasattr(msg, 'tool_calls'):
+                    final_message = msg
+                    break
+            
+            if final_message:
+                print("🤖 Assistant Response:")
+                print("-" * 50)
+                print(final_message.content)
+            else:
+                print("✅ Query processed successfully!")
+                # If no final message, show tool results or basic info
+                tool_messages = [msg for msg in messages if hasattr(msg, 'name')]
+                if tool_messages:
+                    print("\n📊 Tool Results:")
+                    for tool_msg in tool_messages[-3:]:  # Show last 3 tool results
+                        print(f"  • {getattr(tool_msg, 'name', 'Tool')}: {tool_msg.content[:200]}...")
+        else:
+            # Fallback to formatted JSON output
+            import json
+            try:
+                if hasattr(result, '__dict__'):
+                    formatted_result = json.dumps(result.__dict__, indent=2, default=str)
+                else:
+                    formatted_result = json.dumps(result, indent=2, default=str)
+                print(formatted_result)
+            except:
+                print(str(result))
 
     except KeyboardInterrupt:
         print("\nOperation cancelled by user")
