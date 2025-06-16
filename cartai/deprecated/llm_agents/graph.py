@@ -2,10 +2,10 @@ import asyncio
 from pathlib import Path
 from typing import Any
 from pydantic import BaseModel, ConfigDict
-from cartai.llm_agents.graph_states import CartaiDynamicState
+from cartai.deprecated.llm_agents.graph_states import CartaiDynamicState
 from langgraph.graph import StateGraph, START, END
 
-from cartai.llm_agents.utils.yaml_utils import YAMLUtils
+from cartai.utils.yaml_utils import YAMLUtils
 
 
 class CartaiGraph(BaseModel):

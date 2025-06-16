@@ -27,8 +27,8 @@ class MonitoringAgent(MCPAwareAgent):
     def __init__(
         self,
         mcp_client=None,
-        monitoring_config: Dict[str, Any] = None,
-        instructions: str = None,
+        monitoring_config: Dict[str, Any] | None = None,
+        instructions: str | None = None,
         **kwargs,
     ):
         """
@@ -83,12 +83,10 @@ class MonitoringAgent(MCPAwareAgent):
         # Create agent with debugging enabled and proper configuration
         agent = create_react_agent(
             model="openai:gpt-4o-mini",
-            tools=tools,
-            debug=True,  # Enable debugging
-            version="v2",  # Use latest version
-            name="monitoring_agent",  # Name for tracing
-            # interrupt_before=["model"],  # Interrupt before model calls for debugging
-            # interrupt_after=["model"]  # Interrupt after model calls for debugging
+            tools=tools,  # type: ignore[arg-type]
+            debug=True,
+            version="v2",
+            name="monitoring_agent",
         )
 
         context = None  # self._prepare_monitoring_context(state)

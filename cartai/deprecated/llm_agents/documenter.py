@@ -5,15 +5,18 @@ AIDocumenter class for generating documentation using LLM models.
 import os
 from pathlib import Path
 from typing import Any
-from cartai.llm_agents.graph_states import CartaiDynamicState
-from cartai.llm_agents.utils.model_client_utils import LowCostOpenAIModels
+from cartai.deprecated.llm_agents.graph_states import CartaiDynamicState
+from cartai.utils.model_client_utils import LowCostOpenAIModels
 from litellm import acompletion
 from jinja2 import Template
 from pydantic import BaseModel, Field, SecretStr, ConfigDict
 import dotenv
 import aiofiles
+import logging
 
 dotenv.load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class AIDocumenter(BaseModel):
@@ -39,7 +42,7 @@ class AIDocumenter(BaseModel):
     template_name: str | None = Field(
         default=None, description="The name of the template to use"
     )
-    context: dict[str, Any] = Field(
+    default_project_context: dict[str, Any] = Field(
         default_factory=dict, description="The context to use for the template"
     )
     output: dict[str, Any] | None = Field(
@@ -77,7 +80,7 @@ class AIDocumenter(BaseModel):
     async def generate(
         self,
         template_name: str | None = None,
-        context: dict[str, Any] | None = None,
+        project_context: dict[str, Any] | None = None,
         temperature: float = 0.7,
         max_tokens: int = 2000,
     ) -> str:
@@ -90,12 +93,16 @@ class AIDocumenter(BaseModel):
             else:
                 raise ValueError("No template name provided.")
 
-        if not context:
-            context = self.context
+        if not project_context:
+            logger.warning(
+                "No project context provided. Using default project context."
+            )
+            project_context = self.default_project_context
 
         template_content = await self._load_template(template_name)
 
-        prompt = template_content.render(context)
+        logger.info(f"Project context: {project_context}")
+        prompt = template_content.render(project_context)
 
         # Check for API key availability
         api_key = (
@@ -135,7 +142,7 @@ class AIDocumenter(BaseModel):
         if self.template_name is None:
             raise ValueError("template_name must be set")
 
-        response = await self.generate(context=state["project_context"])
+        response = await self.generate(project_context=state["project_context"])
 
         return {
             "messages": [1],

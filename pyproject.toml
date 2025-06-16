@@ -24,7 +24,7 @@ dependencies = [
 repository = "https://www.github.com/ContrastoAI/cartai"
 
 [project.scripts]
-cartai = "cartai.cli.main:app"
+cartai = "cartai.deprecated.cli.main:app"
 
 [build-system]
 requires = ["pdm-backend"]

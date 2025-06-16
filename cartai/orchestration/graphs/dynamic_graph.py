@@ -9,10 +9,10 @@ from datetime import datetime
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.client import MultiServerMCPClient  # type: ignore
 from cartai.mcps.registry.mcp_registry import MCPRegistry
 from cartai.orchestration.states.ml_pipeline_state import MLPipelineState
-from cartai.llm_agents.utils.yaml_utils import YAMLUtils
+from cartai.utils.yaml_utils import YAMLUtils
 
 logger = logging.getLogger(__name__)
 
@@ -272,7 +272,7 @@ class CartaiGraph(BaseModel):
         # Update with initial state values
         ml_state_dict = dict(ml_state)
         ml_state_dict.update(initial_state)
-        ml_state = MLPipelineState(**ml_state_dict)
+        ml_state = MLPipelineState(**ml_state_dict)  # type: ignore
 
         # Execute workflow
         compiled_workflow = self.compile()

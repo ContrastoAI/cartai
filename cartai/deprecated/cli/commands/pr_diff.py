@@ -9,7 +9,7 @@ import requests
 import fnmatch
 
 from rich.console import Console
-from cartai.llm_agents.documenter import AIDocumenter
+from cartai.deprecated.llm_agents.documenter import AIDocumenter
 
 console = Console()
 
@@ -80,7 +80,7 @@ async def pr_diff_command(
     documenter = AIDocumenter()
     summary = await documenter.generate(
         template_name="pr_diff.jinja",
-        context={
+        project_context={
             "pr_title": "Add new feature",
             "description": "Add a new feature to the project",
             "diff": diff,

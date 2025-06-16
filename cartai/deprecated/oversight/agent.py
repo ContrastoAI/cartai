@@ -5,12 +5,12 @@ import logging
 import textwrap
 import os
 
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_mcp_adapters.client import MultiServerMCPClient  # type: ignore
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from dotenv import load_dotenv
-from cartai.oversight.settings import settings
+from cartai.deprecated.oversight.settings import settings
 
 load_dotenv()
 
@@ -79,7 +79,7 @@ async def process_query(query: str) -> Dict[str, Any]:
                         "OPENAPI_MCP_HEADERS",
                         "mcp/notion",
                     ],
-                    "env": {"OPENAPI_MCP_HEADERS": headers},
+                    "env": {"OPENAPI_MCP_HEADERS": str(headers)},
                     "transport": "stdio",
                 },
             }

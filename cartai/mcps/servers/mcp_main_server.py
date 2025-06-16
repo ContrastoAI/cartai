@@ -1,7 +1,7 @@
 from fastmcp import FastMCP
-from cartai.oversight.mcp_servers.mcp_mlflow import mlflow_mcp
+from cartai.mcps.servers.mcp_mlflow import mlflow_mcp
 
-main_mcp = FastMCP(name="Contrasto CartAI MCP Server")
+main_mcp: FastMCP = FastMCP(name="Contrasto CartAI MCP Server")
 main_mcp.mount("mlflow", mlflow_mcp)
 
 

@@ -2,8 +2,8 @@
 README generation command implementation
 """
 
-from cartai.llm_agents.graph import CartaiGraph
-from cartai.llm_agents.graph_states import CartaiDynamicState
+from cartai.deprecated.llm_agents.graph import CartaiGraph
+from cartai.deprecated.llm_agents.graph_states import CartaiDynamicState
 import typer
 import asyncio
 from rich.console import Console

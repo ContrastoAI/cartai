@@ -5,7 +5,7 @@ from typing import Dict, Optional, List
 from dotenv import load_dotenv
 
 from cartai.mcps.exceptions import MCPInitializationError
-from cartai.llm_agents.utils.yaml_utils import YAMLUtils
+from cartai.utils.yaml_utils import YAMLUtils
 
 logger = logging.getLogger(__name__)
 

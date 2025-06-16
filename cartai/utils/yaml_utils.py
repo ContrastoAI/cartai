@@ -2,17 +2,11 @@ import importlib
 from typing import Any
 import yaml
 
-from cartai.llm_agents.documenter import AIDocumenter
-
 
 class YAMLUtils:
     @staticmethod
     def dummy_constructor(loader, node):
         return lambda state: None
-
-    @staticmethod
-    def documenter_constructor(loader, node):
-        return AIDocumenter
 
     @staticmethod
     def import_class(path: str) -> Any:
@@ -36,7 +30,6 @@ class YAMLUtils:
     def register_constructors(cls):
         """Register built-in YAML constructors for common cases"""
         yaml.SafeLoader.add_constructor("!dummy", cls.dummy_constructor)
-        yaml.SafeLoader.add_constructor("!documenter", cls.documenter_constructor)
 
     @staticmethod
     def safe_load(stream):

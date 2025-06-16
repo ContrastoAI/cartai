@@ -1,7 +1,7 @@
 import json
 import pytest
 from unittest.mock import Mock, patch
-from cartai.oversight.mcp_servers.mcp_mlflow import (
+from cartai.mcps.servers.mcp_mlflow import (
     _list_models,
     _list_experiments,
     _get_model_details,
@@ -62,7 +62,7 @@ MOCK_RUN.data = mock_run_data
 
 @pytest.fixture
 def mock_client():
-    with patch("cartai.oversight.mcp_servers.mcp_mlflow.client") as mock:
+    with patch("cartai.mcps.servers.mcp_mlflow.client") as mock:
         # Setup mock responses
         mock.search_registered_models.return_value = [MOCK_MODEL]
         mock.search_experiments.return_value = [MOCK_EXPERIMENT]
@@ -75,7 +75,7 @@ def mock_client():
 
 @pytest.fixture
 def mock_mlflow():
-    with patch("cartai.oversight.mcp_servers.mcp_mlflow.mlflow") as mock:
+    with patch("cartai.mcps.servers.mcp_mlflow.mlflow") as mock:
         mock.__version__ = "2.22.1"
         mock.get_tracking_uri.return_value = "http://localhost:5000"
         mock.get_registry_uri.return_value = "http://localhost:5000"

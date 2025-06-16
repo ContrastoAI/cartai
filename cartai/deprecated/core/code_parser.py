@@ -10,7 +10,7 @@ from typing import Any, Set, Union, Literal
 import re
 from pydantic import BaseModel, Field, ConfigDict
 
-from cartai.llm_agents.graph_states import CartaiDynamicState
+from cartai.deprecated.llm_agents.graph_states import CartaiDynamicState
 
 
 class ParsedBase(BaseModel):

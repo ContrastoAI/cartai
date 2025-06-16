@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 from jinja2 import Template
 
-from cartai.llm_agents.documenter import AIDocumenter
-from cartai.llm_agents.utils.model_client_utils import LowCostOpenAIModels
+from cartai.deprecated.llm_agents.documenter import AIDocumenter
+from cartai.utils.model_client_utils import LowCostOpenAIModels
 
 
 @pytest.fixture
@@ -12,7 +12,9 @@ def documenter():
     """Create a basic documenter instance for testing"""
     return AIDocumenter(
         model=LowCostOpenAIModels.GPT_4O_MINI,
-        template_dir=Path("cartai/llm_agents/templates"),  # Use a test directory
+        template_dir=Path(
+            "cartai/deprecated/llm_agents/templates"
+        ),  # Use a test directory
     )
 
 

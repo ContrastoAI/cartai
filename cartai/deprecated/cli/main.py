@@ -6,8 +6,8 @@ CartAI CLI - A tool for crafting documentation from code.
 import typer
 import asyncio
 from rich.console import Console
-from cartai.cli.commands.readme import readme_command
-from cartai.cli.commands.pr_diff import pr_diff_command
+from cartai.deprecated.cli.commands.readme import readme_command
+from cartai.deprecated.cli.commands.pr_diff import pr_diff_command
 
 
 app = typer.Typer(help="CartAI - AI-powered documentation tools.")
