@@ -64,5 +64,5 @@ mcp-server:
 start-all: mlflow-clean mlflow-build mlflow-start mcp-server
 
 .PHONY: agent
-agent: 
+agent:
 	uv run python ./cartai/oversight/agent.py 'List experiments please'

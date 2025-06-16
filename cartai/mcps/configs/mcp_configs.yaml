@@ -1,0 +1,63 @@
+environments:
+  development:
+    mcps:
+      mlflow:
+        type: "mlflow"
+        transport: "streamable_http"
+        url: "http://localhost:9000/mcp/"
+        timeout: 30
+        enabled: true
+
+      notion:
+        type: "notion"
+        transport: "stdio"
+        command: "docker"
+        args: ["run", "--rm", "-i", "-e", "OPENAPI_MCP_HEADERS", "mcp/notion"]
+        env:
+          OPENAPI_MCP_HEADERS: '{"Authorization":"Bearer ${NOTION_TOKEN}","Notion-Version":"2022-06-28"}'
+        enabled: true
+
+  production:
+    mcps:
+      mlflow:
+        type: "mlflow"
+        transport: "streamable_http"
+        url: "${MLFLOW_TRACKING_URI}"
+        timeout: 60
+        retry_attempts: 3
+        enabled: true
+
+      notion:
+        type: "notion"
+        transport: "stdio"
+        command: "docker"
+        args: ["run", "--rm", "-i", "-e", "OPENAPI_MCP_HEADERS", "mcp/notion"]
+        env:
+          OPENAPI_MCP_HEADERS: '{"Authorization":"Bearer ${NOTION_TOKEN}","Notion-Version":"2022-06-28"}'
+        enabled: true
+
+      slack:
+        type: "slack"
+        transport: "stdio"
+        command: "docker"
+        args: ["run", "--rm", "-i", "-e", "SLACK_TOKEN", "mcp/slack"]
+        env:
+          SLACK_TOKEN: "${SLACK_BOT_TOKEN}"
+        enabled: false  # Enable when needed
+
+  testing:
+    mcps:
+      mlflow:
+        type: "mlflow"
+        transport: "streamable_http"
+        url: "http://test-mlflow:5000"
+        timeout: 15
+        enabled: true
+
+      # Minimal config for testing
+      mock_notion:
+        type: "notion"
+        transport: "stdio"
+        command: "echo"
+        args: ["mock-mcp"]
+        enabled: true

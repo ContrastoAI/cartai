@@ -2,10 +2,13 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Dict, List, Optional, Union, Any
 from fastmcp import FastMCP
 import mlflow
 from mlflow import MlflowClient
+from mlflow.entities import Experiment, Run
+from mlflow.entities.model_registry import RegisteredModel
 
 # Set up logging
 log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
@@ -21,10 +24,9 @@ mlflow.set_tracking_uri(uri=TRACKING_URI)
 logger.info(f"Using MLflow tracking server at: {TRACKING_URI}")
 
 # Init Clients
+client: MlflowClient = MlflowClient()
 
-client = MlflowClient()
-
-mlflow_mcp = FastMCP(
+mlflow_mcp: FastMCP = FastMCP(
     name="mlflow",
     instructions="""
     I can help you interact with your MLflow tracking server to manage machine learning
@@ -42,16 +44,15 @@ class MLflowTools:
     """Collection of helper utilities for MLflow interactions."""
 
     @staticmethod
-    def _format_timestamp(timestamp_ms: int) -> str:
+    def _format_timestamp(timestamp_ms: Optional[int]) -> str:
         """Convert a millisecond timestamp to a human-readable string."""
         if not timestamp_ms:
             return "N/A"
-        dt = datetime.fromtimestamp(timestamp_ms / 1000.0)
+        dt = datetime.fromtimestamp(timestamp_ms / 1000.0, tz=timezone.utc)
         return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@mlflow_mcp.tool()
-def list_models(name_contains: str = "", max_results: int = 100) -> str:
+def _list_models(name_contains: str = "", max_results: int = 100) -> str:
     """
     List all registered models in the MLflow model registry, with optional filtering.
 
@@ -68,7 +69,9 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
 
     try:
         # Get all registered models
-        registered_models = client.search_registered_models(max_results=max_results)
+        registered_models: List[RegisteredModel] = client.search_registered_models(
+            max_results=max_results
+        )
 
         # Filter by name if specified
         if name_contains:
@@ -79,11 +82,11 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
             ]
 
         # Create a list to hold model information
-        models_info = []
+        models_info: List[Dict[str, Any]] = []
 
         # Extract relevant information for each model
         for model in registered_models:
-            model_info = {
+            model_info: Dict[str, Any] = {
                 "name": model.name,
                 "creation_timestamp": MLflowTools._format_timestamp(
                     model.creation_timestamp
@@ -101,7 +104,7 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
             # Add the latest versions if available
             if model.latest_versions and len(model.latest_versions) > 0:
                 for version in model.latest_versions:
-                    version_info = {
+                    version_info: Dict[str, Any] = {
                         "version": version.version,
                         "status": version.status,
                         "stage": version.current_stage,
@@ -114,7 +117,10 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
 
             models_info.append(model_info)
 
-        result = {"total_models": len(models_info), "models": models_info}
+        result: Dict[str, Any] = {
+            "total_models": len(models_info),
+            "models": models_info,
+        }
 
         return json.dumps(result, indent=2)
 
@@ -125,7 +131,11 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
 
 
 @mlflow_mcp.tool()
-def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
+def list_models(name_contains: str = "", max_results: int = 100) -> str:
+    return _list_models(name_contains, max_results)
+
+
+def _list_experiments(name_contains: str = "", max_results: int = 100) -> str:
     """
     List all experiments in the MLflow tracking server, with optional filtering.
 
@@ -140,7 +150,7 @@ def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
 
     try:
         # Get all experiments
-        experiments = client.search_experiments()
+        experiments: List[Experiment] = client.search_experiments()
 
         # Filter by name if specified
         if name_contains:
@@ -152,11 +162,11 @@ def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
         experiments = experiments[:max_results]
 
         # Create a list to hold experiment information
-        experiments_info = []
+        experiments_info: List[Dict[str, Any]] = []
 
         # Extract relevant information for each experiment
         for exp in experiments:
-            exp_info = {
+            exp_info: Dict[str, Any] = {
                 "experiment_id": exp.experiment_id,
                 "name": exp.name,
                 "artifact_location": exp.artifact_location,
@@ -190,7 +200,7 @@ def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
 
             experiments_info.append(exp_info)
 
-        result = {
+        result: Dict[str, Any] = {
             "total_experiments": len(experiments_info),
             "experiments": experiments_info,
         }
@@ -204,7 +214,11 @@ def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
 
 
 @mlflow_mcp.tool()
-def get_model_details(model_name: str) -> str:
+def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
+    return _list_experiments(name_contains, max_results)
+
+
+def _get_model_details(model_name: str) -> str:
     """
     Get detailed information about a specific registered model.
 
@@ -218,9 +232,9 @@ def get_model_details(model_name: str) -> str:
 
     try:
         # Get the registered model
-        model = client.get_registered_model(model_name)
+        model: RegisteredModel = client.get_registered_model(model_name)
 
-        model_info = {
+        model_info: Dict[str, Any] = {
             "name": model.name,
             "creation_timestamp": MLflowTools._format_timestamp(
                 model.creation_timestamp
@@ -239,7 +253,7 @@ def get_model_details(model_name: str) -> str:
         versions = client.search_model_versions(f"name='{model_name}'")
 
         for version in versions:
-            version_info = {
+            version_info: Dict[str, Any] = {
                 "version": version.version,
                 "status": version.status,
                 "stage": version.current_stage,
@@ -253,9 +267,9 @@ def get_model_details(model_name: str) -> str:
             # Get additional information about the run if available
             if version.run_id:
                 try:
-                    run = client.get_run(version.run_id)
+                    run: Run = client.get_run(version.run_id)
                     # Extract only essential run information to avoid serialization issues
-                    run_metrics = {}
+                    run_metrics: Dict[str, Union[float, str]] = {}
                     for k, v in run.data.metrics.items():
                         try:
                             run_metrics[k] = float(v)
@@ -289,7 +303,11 @@ def get_model_details(model_name: str) -> str:
 
 
 @mlflow_mcp.tool()
-def get_system_info() -> str:
+def get_model_details(model_name: str) -> str:
+    return _get_model_details(model_name)
+
+
+def _get_system_info() -> str:
     """
     Get information about the MLflow tracking server and system.
 
@@ -299,16 +317,16 @@ def get_system_info() -> str:
     logger.info("Getting MLflow system information")
 
     try:
-        info = {
+        info: Dict[str, Any] = {
             "mlflow_version": mlflow.__version__,
             "tracking_uri": mlflow.get_tracking_uri(),
             "registry_uri": mlflow.get_registry_uri(),
-            "artifact_uri": mlflow.get_artifact_uri(),
             "python_version": sys.version,
             "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
-        # Get experiment count
+        # Get experiment count and store experiments for later use
+        experiments: List[Experiment] = []
         try:
             experiments = client.search_experiments()
             info["experiment_count"] = len(experiments)
@@ -324,13 +342,12 @@ def get_system_info() -> str:
             logger.warning(f"Error getting model count: {str(e)}")
             info["model_count"] = "Error retrieving count"
 
-        # Get active run count
+        logger.info(f"Experiments: {experiments}")
         try:
             active_runs = 0
             for exp in experiments:
                 runs = client.search_runs(
                     experiment_ids=[exp.experiment_id],
-                    filter_string="attributes.status = 'RUNNING'",
                     max_results=1000,
                 )
                 active_runs += len(runs)
@@ -340,12 +357,93 @@ def get_system_info() -> str:
             logger.warning(f"Error getting active run count: {str(e)}")
             info["active_runs"] = "Error retrieving count"
 
+        logger.info(f"Active runs: {info['active_runs']}")
         return json.dumps(info, indent=2)
 
     except Exception as e:
         error_msg = f"Error getting system info: {str(e)}"
         logger.error(error_msg, exc_info=True)
         return json.dumps({"error": error_msg})
+
+
+@mlflow_mcp.tool()
+def get_system_info() -> str:
+    return _get_system_info()
+
+
+def _list_runs(experiment_id: str, max_results: int = 100) -> str:
+    """
+    List all runs for a specific experiment, including their metrics and metadata.
+
+    Args:
+        experiment_id: The ID of the experiment to list runs for
+        max_results: Maximum number of results to return (default: 100)
+
+    Returns:
+        A JSON string containing all runs for the experiment with their metrics and metadata.
+    """
+    logger.info(f"Fetching runs for experiment {experiment_id} (max: {max_results})")
+
+    try:
+        # Get all runs for the experiment
+        runs: List[Run] = client.search_runs(
+            experiment_ids=[experiment_id], max_results=max_results
+        )
+
+        # Create a list to hold run information
+        runs_info: List[Dict[str, Any]] = []
+
+        # Extract relevant information for each run
+        for runn in runs:
+            # Convert metrics to float where possible
+            metrics: Dict[str, Union[float, str]] = {}
+            for k, v in runn.data.metrics.items():
+                try:
+                    metrics[k] = float(v)
+                except:  # noqa: E722
+                    metrics[k] = str(v)
+
+            # Convert parameters to appropriate types
+            params: Dict[str, Union[float, str]] = {}
+            for k, v in runn.data.params.items():
+                try:
+                    # Try to convert to float if possible
+                    params[k] = float(v)
+                except:  # noqa: E722
+                    params[k] = str(v)
+
+            run_info: Dict[str, Any] = {
+                "run_id": runn.info.run_id,
+                "status": runn.info.status,
+                "start_time": MLflowTools._format_timestamp(runn.info.start_time),
+                "end_time": MLflowTools._format_timestamp(runn.info.end_time)
+                if runn.info.end_time
+                else None,
+                "metrics": metrics,
+                "parameters": params,
+                "tags": runn.data.tags,
+                "artifact_uri": runn.info.artifact_uri,
+            }
+
+            runs_info.append(run_info)
+
+        result: Dict[str, Any] = {
+            "experiment_id": experiment_id,
+            "total_runs": len(runs_info),
+            "runs": runs_info,
+        }
+
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        error_msg = f"Error listing runs: {str(e)}"
+        logger.error(error_msg, exc_info=True)
+        return json.dumps({"error": error_msg})
+
+
+@mlflow_mcp.tool()
+def list_runs(experiment_id: str, max_results: int = 100) -> str:
+    return _list_runs(experiment_id, max_results)
 
 
 if __name__ == "__main__":

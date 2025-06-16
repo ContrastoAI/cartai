@@ -3,6 +3,7 @@ import asyncio
 from typing import Dict, Any
 import logging
 import textwrap
+import os
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
@@ -58,6 +59,10 @@ async def process_query(query: str) -> Dict[str, Any]:
     """
     try:
         # Set up server parameters
+        headers = {
+            "Authorization": f"Bearer {os.getenv('NOTION_TOKEN')}",
+            "Notion-Version": "2022-06-28",
+        }
         client = MultiServerMCPClient(
             {
                 "mlflow": {
@@ -67,17 +72,16 @@ async def process_query(query: str) -> Dict[str, Any]:
                 "notionApi": {
                     "command": "docker",
                     "args": [
-                      "run",
-                      "--rm",
-                      "-i",
-                      "-e", "OPENAPI_MCP_HEADERS",
-                      "mcp/notion"
+                        "run",
+                        "--rm",
+                        "-i",
+                        "-e",
+                        "OPENAPI_MCP_HEADERS",
+                        "mcp/notion",
                     ],
-                    "env": {
-                      "OPENAPI_MCP_HEADERS": "{\"Authorization\":\"Bearer ntn_xxx\",\"Notion-Version\":\"2022-06-28\"}"
-                    },
+                    "env": {"OPENAPI_MCP_HEADERS": headers},
                     "transport": "stdio",
-                }
+                },
             }
         )
         tools = await client.get_tools()
@@ -126,21 +130,25 @@ def main():
         result = asyncio.run(process_query(args.query))
 
         print("\n=== Results ===\n")
-        
+
         # Beautify the output
         if isinstance(result, dict) and "error" in result:
             print(f"❌ Error: {result['error']}")
-        elif hasattr(result, 'get') and result.get('messages'):
+        elif hasattr(result, "get") and result.get("messages"):
             # Extract the final AI response
-            messages = result['messages']
+            messages = result["messages"]
             final_message = None
-            
+
             # Find the last AI message with actual content
             for msg in reversed(messages):
-                if hasattr(msg, 'content') and msg.content and not hasattr(msg, 'tool_calls'):
+                if (
+                    hasattr(msg, "content")
+                    and msg.content
+                    and not hasattr(msg, "tool_calls")
+                ):
                     final_message = msg
                     break
-            
+
             if final_message:
                 print("🤖 Assistant Response:")
                 print("-" * 50)
@@ -148,21 +156,27 @@ def main():
             else:
                 print("✅ Query processed successfully!")
                 # If no final message, show tool results or basic info
-                tool_messages = [msg for msg in messages if hasattr(msg, 'name')]
+                tool_messages = [msg for msg in messages if hasattr(msg, "name")]
                 if tool_messages:
                     print("\n📊 Tool Results:")
                     for tool_msg in tool_messages[-3:]:  # Show last 3 tool results
-                        print(f"  • {getattr(tool_msg, 'name', 'Tool')}: {tool_msg.content[:200]}...")
+                        print(
+                            f"  • {getattr(tool_msg, 'name', 'Tool')}: {tool_msg.content[:200]}..."
+                        )
         else:
             # Fallback to formatted JSON output
             import json
+
             try:
-                if hasattr(result, '__dict__'):
-                    formatted_result = json.dumps(result.__dict__, indent=2, default=str)
+                if hasattr(result, "__dict__"):
+                    formatted_result = json.dumps(
+                        result.__dict__, indent=2, default=str
+                    )
                 else:
                     formatted_result = json.dumps(result, indent=2, default=str)
                 print(formatted_result)
-            except:
+            except Exception as e:
+                print(f"Error formatting result: {str(e)}")
                 print(str(result))
 
     except KeyboardInterrupt:

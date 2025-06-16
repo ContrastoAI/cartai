@@ -42,3 +42,8 @@ class YAMLUtils:
     def safe_load(stream):
         YAMLUtils.register_constructors()
         return yaml.safe_load(stream)
+
+    @staticmethod
+    def safe_dump(data, stream=None, **kwargs):
+        """Safe dump YAML data"""
+        return yaml.safe_dump(data, stream=stream, **kwargs)

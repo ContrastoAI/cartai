@@ -1,0 +1,27 @@
+name: "ML Pipeline - Cross-Domain Example"
+description: "Example workflow demonstrating governance and observability integration"
+
+required_mcps:
+  - mlflow
+  - notion
+
+agents:
+  - name: monitoring_agent
+    description: "Monitor MLflow experiments and collect metrics"
+    logic: "cartai.agents.observability.monitoring_agent.MonitoringAgent"
+    mcps: ["mlflow", "notion"]
+    params:
+      instructions: "Please analyze the following ML experiments without looking for a registered model. Select the run with the best metrics. In case of a tie, select the experiment with the highest accuracy. Please also create a report in Notion 'PhD' page."
+      monitoring_config:
+        thresholds:
+          accuracy_degradation_threshold: 0.05
+          latency_threshold_ms: 1000
+          error_rate_threshold: 0.05
+        alert_settings:
+          enable_performance_alerts: true
+          enable_system_alerts: true
+
+workflow_metadata:
+  version: "1.0.0"
+  created_by: "CartAI System minimal"
+  use_case: "ML model deployment with governance"
