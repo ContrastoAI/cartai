@@ -9,12 +9,20 @@ class YAMLUtils:
         return lambda state: None
 
     @staticmethod
+    def logging_class_constructor(loader, node):
+        """
+        Constructor for logging classes that returns the class path as a string.
+        The actual class loading will be done lazily when needed.
+        """
+        return loader.construct_scalar(node)
+
+    @staticmethod
     def import_class(path: str) -> Any:
         """
         Import a class from a string path.
 
         Args:
-            path: Path in format "module.submodule.ClassName"
+            path: Path in format "module.submodule.ClassName" or just "ClassName" for logging classes
 
         Returns:
             The class object
@@ -30,6 +38,8 @@ class YAMLUtils:
     def register_constructors(cls):
         """Register built-in YAML constructors for common cases"""
         yaml.SafeLoader.add_constructor("!dummy", cls.dummy_constructor)
+        
+        yaml.SafeLoader.add_constructor("!logging_class", cls.logging_class_constructor)
 
     @staticmethod
     def safe_load(stream):

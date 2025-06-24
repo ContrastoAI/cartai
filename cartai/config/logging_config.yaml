@@ -1,0 +1,94 @@
+version: 1
+
+environments:
+  development:
+    formatters:
+      default:
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      detailed:
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"
+    
+    handlers:
+      console:
+        class: !logging_class logging.StreamHandler
+        formatter: default
+        level: DEBUG
+      
+      file:
+        class: !logging_class logging.handlers.RotatingFileHandler
+        formatter: detailed
+        level: INFO
+        filename: logs/cartai.log
+        mode: a
+        encoding: utf-8
+        maxBytes: 10485760  # 10MB
+        backupCount: 5
+    
+    root:
+      level: DEBUG
+      handlers: [console, file]
+
+  production:
+    formatters:
+      default:
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      json:
+        class: !logging_class pythonjsonlogger.jsonlogger.JsonFormatter
+        format: "%(asctime)s %(name)s %(levelname)s %(pathname)s %(lineno)d %(message)s %(process)d %(threadName)s"
+    
+    handlers:
+      console:
+        class: !logging_class logging.StreamHandler
+        formatter: default
+        level: INFO
+      
+      file:
+        class: !logging_class logging.handlers.TimedRotatingFileHandler
+        formatter: json
+        level: INFO
+        filename: /var/log/cartai/cartai.log
+        when: midnight
+        interval: 1
+        backupCount: 30
+        encoding: utf-8
+      
+      # Example Logfire configuration
+      logfire:
+        class: !logging_class logfire.LogfireHandler
+        formatter: json
+        level: INFO
+        source_token: ${LOGFIRE_SOURCE_TOKEN}
+        batch_size: 100
+        flush_interval: 5.0
+      
+      cloudwatch:
+        class: !logging_class watchtower.CloudWatchLogHandler
+        formatter: json
+        level: INFO
+        log_group: cartai
+        stream_name: ${CARTAI_SERVICE_NAME}
+        use_queues: true
+        send_interval: 60
+        create_log_group: true
+        aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+        aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+        aws_region_name: ${AWS_REGION}
+    
+    root:
+      level: INFO
+      handlers: [console, file, logfire, cloudwatch]
+
+  testing:
+    formatters:
+      default:
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    
+    handlers:
+      console:
+        class: !logging_class logging.StreamHandler
+        formatter: default
+        level: DEBUG
+    
+    root:
+      level: DEBUG
+      handlers: [console] 
