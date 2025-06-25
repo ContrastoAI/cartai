@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import sys
 from datetime import datetime, timezone
@@ -9,21 +8,14 @@ import mlflow
 from mlflow import MlflowClient
 from mlflow.entities import Experiment, Run
 from mlflow.entities.model_registry import RegisteredModel
+from cartai.logging import get_logger
 
-# Set up logging
-log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
-logging.basicConfig(
-    level=getattr(logging, log_level),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger("mlflow-mcp-server")
+logger = get_logger(__name__)
 
-# Set MLflow tracking URI from environment variable or use default
 TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000")
 mlflow.set_tracking_uri(uri=TRACKING_URI)
 logger.info(f"Using MLflow tracking server at: {TRACKING_URI}")
 
-# Init Clients
 client: MlflowClient = MlflowClient()
 
 mlflow_mcp: FastMCP = FastMCP(
