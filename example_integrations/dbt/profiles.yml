@@ -1,0 +1,15 @@
+config:
+  send_anonymous_usage_stats: false
+
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: db
+      user: dbt
+      password: dbt
+      port: 5432
+      dbname: dbt
+      schema: public
+      threads: 4 

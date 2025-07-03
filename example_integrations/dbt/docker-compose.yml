@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  dbt:
+    build: .
+    volumes:
+      - dbt_data:/usr/src/dbt
+    environment:
+      - DBT_PROFILES_DIR=/usr/src/dbt
+    depends_on:
+      - db
+    tty: true
+    stdin_open: true
+    entrypoint: ["/bin/bash"]
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=dbt
+      - POSTGRES_PASSWORD=dbt
+      - POSTGRES_DB=dbt
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  dbt_data:
+  postgres_data: 
