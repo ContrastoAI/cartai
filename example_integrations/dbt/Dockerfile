@@ -1,24 +1,14 @@
-FROM python:3.11-slim
+FROM ghcr.io/dbt-labs/dbt-postgres:1.9.0
 
-WORKDIR /usr/src/dbt
+RUN pip install uv
+RUN git clone https://github.com/dbt-labs/dbt-mcp.git /opt/dbt-mcp \
+    && cd /opt/dbt-mcp
 
-COPY . .
+WORKDIR /usr/app
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    git \
-    openssh-client \
-    software-properties-common \
-    make \
-    build-essential \
-    ca-certificates \
-    libpq-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY .env /usr/app/.env
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN mkdir -p /root/.dbt
+COPY profiles.yml /root/.dbt/profiles.yml
 
-ENV PYTHONIOENCODING=utf-8
-ENV LANG=C.UTF-8
-
-EXPOSE 8080
+ENTRYPOINT ["uvx", "--env-file", "/usr/app/.env", "dbt-mcp"]

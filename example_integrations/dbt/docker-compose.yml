@@ -4,14 +4,15 @@ services:
   dbt:
     build: .
     volumes:
-      - dbt_data:/usr/src/dbt
+      - dbt_data:/usr/app
     environment:
-      - DBT_PROFILES_DIR=/usr/src/dbt
+      - DBT_PROFILES_DIR=/root/.dbt
     depends_on:
       - db
     tty: true
     stdin_open: true
-    entrypoint: ["/bin/bash"]
+    ports:
+      - "8080:8080"
 
   db:
     image: postgres:13
