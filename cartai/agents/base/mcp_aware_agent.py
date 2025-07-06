@@ -65,8 +65,36 @@ class MCPAwareAgent(ABC, Generic[StateT]):
 
         try:
             if self._tools_cache is None:
-                self._tools_cache = await self.mcp_client.get_tools()
-                logger.debug(f"{self.name}: Retrieved {len(self._tools_cache)} tools")
+                try:
+                    self._tools_cache = await self.mcp_client.get_tools()
+                    logger.debug(
+                        f"{self.name}: Retrieved {len(self._tools_cache)} tools"
+                    )
+                except Exception as e:
+                    # Log detailed error information
+                    logger.error(f"{self.name}: Failed to get tools: {str(e)}")
+                    if hasattr(e, "__cause__") and e.__cause__:
+                        logger.error(f"{self.name}:   Caused by: {str(e.__cause__)}")
+                    if hasattr(e, "__context__") and e.__context__:
+                        logger.error(f"{self.name}:   Context: {str(e.__context__)}")
+                    logger.error(f"{self.name}:   Traceback:", exc_info=e)
+
+                    # If it's an ExceptionGroup, log each sub-exception
+                    if isinstance(e, ExceptionGroup):
+                        for i, sub_e in enumerate(e.exceptions, 1):
+                            logger.error(
+                                f"{self.name}: Sub-exception {i}: {str(sub_e)}"
+                            )
+                            if hasattr(sub_e, "__cause__") and sub_e.__cause__:
+                                logger.error(
+                                    f"{self.name}:   Caused by: {str(sub_e.__cause__)}"
+                                )
+                            if hasattr(sub_e, "__context__") and sub_e.__context__:
+                                logger.error(
+                                    f"{self.name}:   Context: {str(sub_e.__context__)}"
+                                )
+                            logger.error(f"{self.name}:   Traceback:", exc_info=sub_e)
+                    raise
             return self._tools_cache
         except Exception as e:
             logger.warning(f"{self.name}: Failed to get tools: {str(e)}")
