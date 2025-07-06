@@ -3,8 +3,6 @@ version: '3.8'
 services:
   dbt:
     build: .
-    volumes:
-      - dbt_data:/usr/app
     environment:
       - DBT_PROFILES_DIR=/root/.dbt
     depends_on:
@@ -26,5 +24,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  dbt_data:
   postgres_data: 
