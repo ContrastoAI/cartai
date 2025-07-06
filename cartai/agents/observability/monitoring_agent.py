@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.prebuilt import create_react_agent
 
 from cartai.agents.base.mcp_aware_agent import MCPAwareAgent
-from cartai.agents.prompts import MONITORING_AGENT_PROMPT, MCP_TOOLS_GUIDANCE
+from cartai.agents.prompts import MCP_TOOLS_GUIDANCE
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,7 @@ class MonitoringAgent(MCPAwareAgent):
         self,
         mcp_client=None,
         monitoring_config: Dict[str, Any] | None = None,
+        core_prompt: str | None = None,
         instructions: str | None = None,
         **kwargs,
     ):
@@ -43,6 +44,7 @@ class MonitoringAgent(MCPAwareAgent):
         self.monitoring_config = monitoring_config or self._get_default_config()
         self.metrics_history: List[Dict] = []
         self.alerts: List[Dict] = []
+        self.core_prompt = core_prompt
         self.instructions = instructions
 
     def _get_default_config(self) -> Dict[str, Any]:
@@ -91,7 +93,7 @@ class MonitoringAgent(MCPAwareAgent):
 
         context = None  # self._prepare_monitoring_context(state)
 
-        system_prompt = f"{MONITORING_AGENT_PROMPT}\n\n{MCP_TOOLS_GUIDANCE}"
+        system_prompt = f"{self.core_prompt}\n\n{MCP_TOOLS_GUIDANCE}"
         user_prompt = f"""
         {self.instructions}
 
@@ -126,6 +128,8 @@ class MonitoringAgent(MCPAwareAgent):
         logger.info("Agent execution completed")
 
         # Extract and parse LLM response
+        formatted_response = self._format_response(response)
+        print(formatted_response)
         analysis_results = self._extract_analysis_results(response)
 
         # Update state with LLM analysis
@@ -178,6 +182,80 @@ class MonitoringAgent(MCPAwareAgent):
             if context_parts
             else "No context information available"
         )
+    
+    def _format_response(self, response: Dict[str, Any]) -> str:
+        """
+        Format the LLM response messages into a beautiful, human-readable format.
+        
+        Args:
+            response: The raw response dictionary from the LLM
+            
+        Returns:
+            A formatted string containing the conversation flow
+        """
+        if not response or not response.get("messages"):
+            return "No messages found in response"
+            
+        formatted_parts = []
+        formatted_parts.append("🤖 Monitoring Agent Analysis")
+        formatted_parts.append("=" * 50)
+        
+        for idx, msg in enumerate(response.get("messages", []), 1):
+            # Add message separator
+            formatted_parts.append(f"\n📝 Step {idx}")
+            formatted_parts.append("-" * 50)
+            
+            # Format based on message type
+            if hasattr(msg, "tool_calls") and not idx == len(response.get("messages", [])):
+                # Tool execution message
+                formatted_parts.append("🔧 Tool Execution:")
+                for tool_call in msg.tool_calls:
+                    tool_name = getattr(tool_call, "name", "Unknown Tool")
+                    formatted_parts.append(f"  Tool: {tool_name}")
+                    if hasattr(tool_call, "arguments"):
+                        args = json.dumps(tool_call.arguments, indent=2)
+                        formatted_parts.append("  Arguments:")
+                        formatted_parts.extend(f"    {line}" for line in args.splitlines())
+                        
+            elif hasattr(msg, "tool_responses"):
+                # Tool response message
+                formatted_parts.append("📊 Tool Response:")
+                for resp in msg.tool_responses:
+                    formatted_parts.append(f"  {resp[:200]}...")
+                    
+            elif hasattr(msg, "content") and msg.content:
+                # Regular message content
+                if "```json" in msg.content:
+                    # Handle JSON blocks specially
+                    parts = msg.content.split("```")
+                    for part in parts:
+                        if part.startswith("json"):
+                            try:
+                                json_obj = json.loads(part[4:].strip())
+                                formatted_parts.append(json.dumps(json_obj, indent=2))
+                            except:
+                                formatted_parts.append(part)
+                        elif part.strip():
+                            formatted_parts.append(part.strip())
+                else:
+                    formatted_parts.append(msg.content.strip())
+            
+            else:
+                # Unknown message type
+                formatted_parts.append("📄 Message:")
+                formatted_parts.append(str(msg))
+        
+        # Add final separator
+        formatted_parts.append("=" * 50)
+        
+        return "\n".join(formatted_parts)
+
+    def _extract_last_message(self, llm_response) -> str:
+        """Extract the last message from the LLM response"""
+        for msg in reversed(llm_response.get("messages", [])):
+            if hasattr(msg, "content") and msg.content:
+                return msg.content
+        return ""
 
     def _extract_analysis_results(self, llm_response) -> Dict[str, Any]:
         """Extract and parse analysis results from LLM response"""

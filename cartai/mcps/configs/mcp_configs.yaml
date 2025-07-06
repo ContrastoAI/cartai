@@ -21,14 +21,19 @@ environments:
         type: "dbt"
         transport: "stdio"
         command: "docker"
-        args: [
-          "run","--rm","-i",
-          "-v","dbt_data:/usr/app",
-          "dbt-dbt"
-        ],
+        args: ["exec", "--interactive", "-i", "dbt", "uvx", "--env-file", ".env", "dbt-mcp"]
         env:
           DBT_PROFILES_DIR: "/root/.dbt"
         enabled: true
+
+      dbt_spawn:
+        type: "dbt"
+        transport: "stdio"
+        command: "docker"
+        args: ["run","--rm","-i", "dbt-dbt"]
+        env:
+          DBT_PROFILES_DIR: "/root/.dbt"
+        enabled: false
 
   production:
     mcps:
