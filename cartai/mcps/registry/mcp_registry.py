@@ -21,10 +21,12 @@ class MCPRegistry:
     """
 
     def __init__(
-        self, config_path: Optional[Path] = None, environment: str = "development"
+        self,
+        mcp_config_path: Optional[Path] = Path("cartai/mcps/configs/mcp_configs.yaml"),
+        environment: str = "development",
     ):
         self.environment = environment
-        self.config_path = config_path or Path("cartai/mcps/configs/mcp_configs.yaml")
+        self.mcp_config_path = mcp_config_path
 
     def get_client_config(self) -> Dict:
         """
@@ -45,7 +47,6 @@ class MCPRegistry:
                     f"No MCP configurations found for environment: {self.environment}"
                 )
                 return {}
-
             # Convert to MultiServerMCPClient format
             client_config = {}
             for name, mcp_data in mcps_config.items():
@@ -62,10 +63,12 @@ class MCPRegistry:
 
     def _load_config(self) -> Dict:
         """Load configuration from YAML file with environment variable substitution"""
-        if not self.config_path.exists():
-            raise FileNotFoundError(f"MCP config file not found: {self.config_path}")
+        if not self.mcp_config_path.exists():
+            raise FileNotFoundError(
+                f"MCP config file not found: {self.mcp_config_path}"
+            )
 
-        with open(self.config_path, "r") as file:
+        with open(self.mcp_config_path, "r") as file:
             config = YAMLUtils.safe_load(file)
 
         # Environment variable substitution
