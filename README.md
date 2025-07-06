@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">🌟 Cartai &mdash; The AI PM, for AI 🌟</h1>
+<h1 align="center">🕵️‍♀️ Cartai 🤖&mdash; The AI supervisor agent, for AI </h1>
 <h3>Crafting intelligent E2E supervision & documentation for trustworthy AI</h2>
 
 <kbd><strong>👩‍💼 Agent-powered project intelligence, from PRD to production</strong></kbd>
@@ -16,37 +16,17 @@
 
 `cartai` is a library that enables end-to-end traceability and lineage of your AI projects. PRDs, data lineage, training experiments, deployments, monitoring, and third-party vibe-coding platforms.
 
+## 🔌 MCP Integrations
+
+| Integration | Status | AI Governance Step | Key Features | Description |
+|------------|--------|-------------------|--------------|-------------|
+| 🏃 MLFlow | ✅ Active v0 | Model Training & Experimentation | • Experiment Tracking<br>• Model Registry<br>• Artifact Management | Comprehensive tracking of ML experiments, model versions, and metrics for reproducible AI development |
+| 🎲 dbt | ✅ Active v0 (Official) | Data Lineage & Feature Engineering | • Data Transformation<br>• Feature Pipeline Tracking<br>• SQL Model Management | End-to-end visibility into data transformations and feature engineering processes |
+| 📝 Notion | ✅ Active v0 (Official) | Project Documentation & Requirements | • PRD Management<br>• Documentation Sync<br>• Project Timeline Tracking | Seamless integration of project documentation, requirements, and AI governance documentation |
+
+
 ## 📂 Codebase Structure
-```
-  📁 cartai/
-    ├── 📄 __init__.py
-    ├── 📁 adapters/
-    ├── 📁 cli/
-    │   ├── 📁 commands/
-    │   │   ├── 📄 __init__.py
-    │   │   ├── 📄 pr_diff.py
-    │   │   └── 📄 readme.py
-    │   └── 📄 main.py
-    ├── 📁 core/
-    │   ├── 📄 __init__.py
-    │   └── 📄 code_parser.py
-    ├── 📁 lineage/
-    ├── 📁 llm_agents/
-    │   ├── 📄 __init__.py
-    │   ├── 📄 documenter.py
-    │   ├── 📄 graph.py
-    │   ├── 📄 graph_states.py
-    │   ├── 📁 templates/
-    │   │   ├── 📄 pr_diff.jinja
-    │   │   └── 📄 readme.jinja
-    │   └── 📁 utils/
-    │       ├── 📄 __init__.py
-    │       ├── 📄 model_client_utils.py
-    │       └── 📄 yaml_utils.py
-    └── 📁 langgraph_config/
-        ├── 📄 dummy_config.yaml
-        └── 📄 repo_documenter.yaml
-```
+WIP
 
 ## ⚙️ Installation
 To get started with the Cartai project, follow these instructions to set up your environment:
