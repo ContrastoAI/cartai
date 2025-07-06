@@ -11,5 +11,4 @@ COPY profiles.yml /root/.dbt/profiles.yml
 
 WORKDIR /usr/app
 
-
-ENTRYPOINT ["uvx", "--env-file", ".env", "dbt-mcp"]
+ENTRYPOINT ["sleep", "infinity"]

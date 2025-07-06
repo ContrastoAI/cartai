@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   dbt:
+    container_name: dbt
     build: .
     environment:
       - DBT_PROFILES_DIR=/root/.dbt
