@@ -38,7 +38,7 @@ class YAMLUtils:
     def register_constructors(cls):
         """Register built-in YAML constructors for common cases"""
         yaml.SafeLoader.add_constructor("!dummy", cls.dummy_constructor)
-        
+
         yaml.SafeLoader.add_constructor("!logging_class", cls.logging_class_constructor)
 
     @staticmethod

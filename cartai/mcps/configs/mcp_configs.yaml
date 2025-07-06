@@ -17,6 +17,24 @@ environments:
           OPENAPI_MCP_HEADERS: '{"Authorization":"Bearer ${NOTION_TOKEN}","Notion-Version":"2022-06-28"}'
         enabled: true
 
+      dbt:
+        type: "dbt"
+        transport: "stdio"
+        command: "docker"
+        args: ["exec", "--interactive", "-i", "dbt", "uvx", "--env-file", ".env", "dbt-mcp"]
+        env:
+          DBT_PROFILES_DIR: "/root/.dbt"
+        enabled: true
+
+      dbt_spawn:
+        type: "dbt"
+        transport: "stdio"
+        command: "docker"
+        args: ["run","--rm","-i", "dbt-dbt"]
+        env:
+          DBT_PROFILES_DIR: "/root/.dbt"
+        enabled: false
+
   production:
     mcps:
       mlflow:

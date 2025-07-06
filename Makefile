@@ -58,9 +58,9 @@ mcp-server:
 .PHONY: start-all
 start-all: mlflow-clean mlflow-build mlflow-start mcp-server
 
-.PHONY: agent
-agent:
-	uv run python .\examples\ml_pipeline_orchestration.py
+.PHONY: agent-dbt
+agent-dbt:
+	uv run python .\examples\ml_pipeline_orchestration.py --mcp_config_path cartai/mcps/configs/mcp_configs.yaml --config_path cartai/orchestration/configs/dbt_example.yaml
 
 # deprecated
 

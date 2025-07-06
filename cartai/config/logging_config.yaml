@@ -7,13 +7,13 @@ environments:
         format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
       detailed:
         format: "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"
-    
+
     handlers:
       console:
         class: !logging_class logging.StreamHandler
         formatter: default
         level: DEBUG
-      
+
       file:
         class: !logging_class logging.handlers.RotatingFileHandler
         formatter: detailed
@@ -23,7 +23,7 @@ environments:
         encoding: utf-8
         maxBytes: 10485760  # 10MB
         backupCount: 5
-    
+
     root:
       level: DEBUG
       handlers: [console, file]
@@ -35,13 +35,13 @@ environments:
       json:
         class: !logging_class pythonjsonlogger.jsonlogger.JsonFormatter
         format: "%(asctime)s %(name)s %(levelname)s %(pathname)s %(lineno)d %(message)s %(process)d %(threadName)s"
-    
+
     handlers:
       console:
         class: !logging_class logging.StreamHandler
         formatter: default
         level: INFO
-      
+
       file:
         class: !logging_class logging.handlers.TimedRotatingFileHandler
         formatter: json
@@ -51,7 +51,7 @@ environments:
         interval: 1
         backupCount: 30
         encoding: utf-8
-      
+
       # Example Logfire configuration
       logfire:
         class: !logging_class logfire.LogfireHandler
@@ -60,7 +60,7 @@ environments:
         source_token: ${LOGFIRE_SOURCE_TOKEN}
         batch_size: 100
         flush_interval: 5.0
-      
+
       cloudwatch:
         class: !logging_class watchtower.CloudWatchLogHandler
         formatter: json
@@ -73,7 +73,7 @@ environments:
         aws_access_key_id: ${AWS_ACCESS_KEY_ID}
         aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
         aws_region_name: ${AWS_REGION}
-    
+
     root:
       level: INFO
       handlers: [console, file, logfire, cloudwatch]
@@ -82,13 +82,13 @@ environments:
     formatters:
       default:
         format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    
+
     handlers:
       console:
         class: !logging_class logging.StreamHandler
         formatter: default
         level: DEBUG
-    
+
     root:
       level: DEBUG
-      handlers: [console] 
+      handlers: [console]

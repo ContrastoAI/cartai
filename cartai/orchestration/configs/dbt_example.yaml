@@ -1,0 +1,23 @@
+name: "DBT Pipeline - Cross-Domain Example"
+description: "Example workflow demonstrating dbt and lineage integration"
+
+# MCPs required for this workflow
+required_mcps:
+  - dbt
+
+agents:
+  - name: monitoring_agent
+    description: "Monitor dbt models and collect metrics"
+    logic: "cartai.agents.observability.monitoring_agent.MonitoringAgent"
+    prompt: "cartai.agents.prompts.DBT_AGENT_PROMPT"
+    instructions: "Please analyze the following dbt models. Select the model with the best metrics. In case of a tie, select the model with the highest accuracy."
+    mcps: ["dbt"]
+    params:
+      monitoring_config:
+        thresholds:
+          accuracy_degradation_threshold: 0.05
+          latency_threshold_ms: 1000
+          error_rate_threshold: 0.05
+        alert_settings:
+          enable_performance_alerts: true
+          enable_system_alerts: true

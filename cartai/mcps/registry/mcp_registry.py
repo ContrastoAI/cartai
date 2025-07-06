@@ -1,7 +1,6 @@
 import os
 import logging
 from pathlib import Path
-from typing import Dict, Optional, List
 from dotenv import load_dotenv
 
 from cartai.mcps.exceptions import MCPInitializationError
@@ -21,17 +20,21 @@ class MCPRegistry:
     """
 
     def __init__(
-        self, config_path: Optional[Path] = None, environment: str = "development"
+        self,
+        mcp_config_path: Path | None = None,
+        environment: str = "development",
     ):
         self.environment = environment
-        self.config_path = config_path or Path("cartai/mcps/configs/mcp_configs.yaml")
+        self.mcp_config_path = mcp_config_path or Path(
+            "cartai/mcps/configs/mcp_configs.yaml"
+        )
 
-    def get_client_config(self) -> Dict:
+    def get_client_config(self) -> dict:
         """
         Load MCP configurations and return in MultiServerMCPClient format
 
         Returns:
-            Dict: Configuration dictionary ready for MultiServerMCPClient
+            dict: Configuration dictionary ready for MultiServerMCPClient
         """
         logger.info(f"Loading MCP configurations for environment: {self.environment}")
 
@@ -45,7 +48,6 @@ class MCPRegistry:
                     f"No MCP configurations found for environment: {self.environment}"
                 )
                 return {}
-
             # Convert to MultiServerMCPClient format
             client_config = {}
             for name, mcp_data in mcps_config.items():
@@ -60,12 +62,14 @@ class MCPRegistry:
             logger.error(f"Failed to load MCP configurations: {str(e)}")
             raise MCPInitializationError(f"MCP configuration loading failed: {str(e)}")
 
-    def _load_config(self) -> Dict:
+    def _load_config(self) -> dict:
         """Load configuration from YAML file with environment variable substitution"""
-        if not self.config_path.exists():
-            raise FileNotFoundError(f"MCP config file not found: {self.config_path}")
+        if not self.mcp_config_path.exists():
+            raise FileNotFoundError(
+                f"MCP config file not found: {self.mcp_config_path}"
+            )
 
-        with open(self.config_path, "r") as file:
+        with open(self.mcp_config_path, "r", encoding="utf-8") as file:  # type: ignore
             config = YAMLUtils.safe_load(file)
 
         # Environment variable substitution
@@ -77,7 +81,7 @@ class MCPRegistry:
         )
         return YAMLUtils.safe_load(config_str)
 
-    def _convert_to_client_config(self, mcp_data: Dict) -> Dict:
+    def _convert_to_client_config(self, mcp_data: dict) -> dict:
         """Convert MCP config to MultiServerMCPClient format"""
         client_config = {}
 
@@ -96,7 +100,7 @@ class MCPRegistry:
 
         return client_config
 
-    def get_mcp_description(self, mcp_name: str) -> Optional[str]:
+    def get_mcp_description(self, mcp_name: str) -> str | None:
         """
         Get the description for a specific MCP.
 
@@ -104,19 +108,19 @@ class MCPRegistry:
             mcp_name: Name of the MCP
 
         Returns:
-            Optional[str]: Description of the MCP if available, None otherwise
+            str | None: Description of the MCP if available, None otherwise
         """
         config = self.get_client_config()
         if mcp_name in config:
             return config[mcp_name].get("description")
         return None
 
-    def get_all_mcp_descriptions(self) -> Dict[str, str]:
+    def get_all_mcp_descriptions(self) -> dict[str, str]:
         """
         Get descriptions for all available MCPs.
 
         Returns:
-            Dict[str, str]: Dictionary mapping MCP names to their descriptions
+            dict[str, str]: Dictionary mapping MCP names to their descriptions
         """
         config = self.get_client_config()
         return {
@@ -124,7 +128,7 @@ class MCPRegistry:
             for name, mcp_config in config.items()
         }
 
-    def get_filtered_client_config(self, mcp_names: List[str]) -> Dict:
+    def get_filtered_client_config(self, mcp_names: list[str]) -> dict:
         """
         Get filtered MCP configuration for specific MCPs.
 
@@ -149,7 +153,7 @@ class MCPRegistry:
         )
         return filtered_config
 
-    def get_available_mcps(self) -> List[str]:
+    def get_available_mcps(self) -> list[str]:
         """Get list of available MCP names from configuration"""
         config = self.get_client_config()
         return list(config.keys())
