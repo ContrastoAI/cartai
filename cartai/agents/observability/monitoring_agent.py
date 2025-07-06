@@ -182,31 +182,33 @@ class MonitoringAgent(MCPAwareAgent):
             if context_parts
             else "No context information available"
         )
-    
+
     def _format_response(self, response: Dict[str, Any]) -> str:
         """
         Format the LLM response messages into a beautiful, human-readable format.
-        
+
         Args:
             response: The raw response dictionary from the LLM
-            
+
         Returns:
             A formatted string containing the conversation flow
         """
         if not response or not response.get("messages"):
             return "No messages found in response"
-            
+
         formatted_parts = []
         formatted_parts.append("🤖 Monitoring Agent Analysis")
         formatted_parts.append("=" * 50)
-        
+
         for idx, msg in enumerate(response.get("messages", []), 1):
             # Add message separator
             formatted_parts.append(f"\n📝 Step {idx}")
             formatted_parts.append("-" * 50)
-            
+
             # Format based on message type
-            if hasattr(msg, "tool_calls") and not idx == len(response.get("messages", [])):
+            if hasattr(msg, "tool_calls") and not idx == len(
+                response.get("messages", [])
+            ):
                 # Tool execution message
                 formatted_parts.append("🔧 Tool Execution:")
                 for tool_call in msg.tool_calls:
@@ -215,14 +217,16 @@ class MonitoringAgent(MCPAwareAgent):
                     if hasattr(tool_call, "arguments"):
                         args = json.dumps(tool_call.arguments, indent=2)
                         formatted_parts.append("  Arguments:")
-                        formatted_parts.extend(f"    {line}" for line in args.splitlines())
-                        
+                        formatted_parts.extend(
+                            f"    {line}" for line in args.splitlines()
+                        )
+
             elif hasattr(msg, "tool_responses"):
                 # Tool response message
                 formatted_parts.append("📊 Tool Response:")
                 for resp in msg.tool_responses:
                     formatted_parts.append(f"  {resp[:200]}...")
-                    
+
             elif hasattr(msg, "content") and msg.content:
                 # Regular message content
                 if "```json" in msg.content:
@@ -233,21 +237,22 @@ class MonitoringAgent(MCPAwareAgent):
                             try:
                                 json_obj = json.loads(part[4:].strip())
                                 formatted_parts.append(json.dumps(json_obj, indent=2))
-                            except:
+                            except Exception as e:
+                                logger.error(f"Error parsing JSON: {e}")
                                 formatted_parts.append(part)
                         elif part.strip():
                             formatted_parts.append(part.strip())
                 else:
                     formatted_parts.append(msg.content.strip())
-            
+
             else:
                 # Unknown message type
                 formatted_parts.append("📄 Message:")
                 formatted_parts.append(str(msg))
-        
+
         # Add final separator
         formatted_parts.append("=" * 50)
-        
+
         return "\n".join(formatted_parts)
 
     def _extract_last_message(self, llm_response) -> str:

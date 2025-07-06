@@ -13,12 +13,12 @@ feature_engineering AS (
         account_status,
         created_at,
         -- Derived features
-        CASE 
+        CASE
             WHEN age < 30 THEN 'Young'
             WHEN age < 50 THEN 'Middle'
             ELSE 'Senior'
         END as age_group,
-        CASE 
+        CASE
             WHEN annual_income < 60000 THEN 'Low'
             WHEN annual_income < 80000 THEN 'Medium'
             ELSE 'High'
@@ -27,4 +27,4 @@ feature_engineering AS (
     FROM customer_data
 )
 
-SELECT * FROM feature_engineering 
+SELECT * FROM feature_engineering

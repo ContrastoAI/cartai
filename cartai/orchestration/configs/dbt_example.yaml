@@ -21,4 +21,3 @@ agents:
         alert_settings:
           enable_performance_alerts: true
           enable_system_alerts: true
-  

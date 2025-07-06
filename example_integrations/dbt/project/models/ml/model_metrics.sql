@@ -28,4 +28,4 @@ WITH mock_metrics AS (
         '{{ ref("raw_customer_data") }}'
 )
 
-SELECT * FROM mock_metrics 
+SELECT * FROM mock_metrics
