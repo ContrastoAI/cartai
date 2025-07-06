@@ -18,4 +18,4 @@ clean-targets:
 
 models:
   cartai_dbt:
-    materialized: table 
+    materialized: table

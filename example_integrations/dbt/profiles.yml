@@ -12,4 +12,4 @@ default:
       port: 5432
       dbname: dbt
       schema: public
-      threads: 4 
+      threads: 4

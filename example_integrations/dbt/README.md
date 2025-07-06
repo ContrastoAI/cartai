@@ -61,4 +61,4 @@ The following environment variables are set in the docker-compose.yml:
 
 - The PostgreSQL data is persisted using a Docker volume
 - The dbt service exposes port 8080 for potential web interfaces
-- All dbt commands should be run from within the dbt container 
+- All dbt commands should be run from within the dbt container
